@@ -1,28 +1,26 @@
 package View;
 
-import javax.imageio.ImageIO;
+import javax.imageio.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.*;
+import java.awt.image.*;
+import java.io.*;
+import java.util.*;
 
 
 class HomePanel extends JPanel {
 	private static final BufferedImage startImage, finishImage;
-	private final JButton startButton;
-	private final JButton finishButton;
-
 	static {
 		try {
-			startImage = ImageIO.read(new File("/Assets/start.png"));
-			finishImage = ImageIO.read(new File("/Assets/finish.png"));
+			startImage = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("/Assets/start.png")));
+			finishImage = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("/Assets/finish.png")));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("Failed to load button images", e);
 		}
 	}
+
+	private final JButton startButton, finishButton;
 
 	public HomePanel(OthelloGUI gui) {
 		// 画面サイズの設定（デフォルト）
@@ -50,32 +48,11 @@ class HomePanel extends JPanel {
 		add(titleLabel, gbc);
 
 		// 各ボタンのサイズ
-		int buttonSize = Math.min(width / 5, height / 5);
+		int buttonSize = Math.min(width / 6, height / 6);
 		Dimension buttonSizeDim = new Dimension(buttonSize, buttonSize);
 
 		// finishボタンの配置
-		finishButton = new JButton();
-		Image finishScaled = finishImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH);
-		finishButton.setIcon(new ImageIcon(finishScaled));
-		finishButton.setPreferredSize(buttonSizeDim);
-		finishButton.setBorderPainted(false);
-		finishButton.setContentAreaFilled(false);
-		finishButton.setFocusPainted(false);
-		finishButton.setRolloverEnabled(false);
-		finishButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				Image finishImagePressed = finishImage.getScaledInstance((int) (buttonSize * 0.8), (int) (buttonSize * 0.8), Image.SCALE_SMOOTH);
-
-				finishButton.setIcon(new ImageIcon(finishImagePressed));
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				Image finishImageReleased = finishImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH);
-				finishButton.setIcon(new ImageIcon(finishImageReleased));
-			}
-		});
+		initButton(finishButton = new JButton(), finishImage, buttonSize);
 		gbc.insets = new Insets(10, 200, 10, 10);
 		gbc.gridx = 1;
 		gbc.gridy = 1;
@@ -84,27 +61,7 @@ class HomePanel extends JPanel {
 		add(finishButton, gbc);
 
 		// startボタンの配置
-		startButton = new JButton();
-		Image startScaled = startImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH);
-		startButton.setIcon(new ImageIcon(startScaled));
-		startButton.setPreferredSize(buttonSizeDim);
-		startButton.setBorderPainted(false);
-		startButton.setContentAreaFilled(false);
-		startButton.setRolloverEnabled(false);
-		startButton.setFocusPainted(false);
-		startButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				Image startImagePressed = startImage.getScaledInstance((int) (buttonSize * 0.8), (int) (buttonSize * 0.8), Image.SCALE_SMOOTH);
-				startButton.setIcon(new ImageIcon(startImagePressed));
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				Image startImageReleased = startImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH);
-				startButton.setIcon(new ImageIcon(startImageReleased));
-			}
-		});
+		initButton(startButton = new JButton(), startImage, buttonSize);
 		gbc.insets = new Insets(10, 10, 10, 200);
 		gbc.gridx = 2;
 		gbc.gridy = 1;
@@ -112,6 +69,47 @@ class HomePanel extends JPanel {
 		gbc.gridheight = 2;
 		add(startButton, gbc);
 
+	}
+
+	/**
+	 * ボタンの初期化
+	 *
+	 * @param button     初期化対象
+	 * @param image      画像
+	 * @param buttonSize ボタンサイズ
+	 */
+	private void initButton(final JButton button, BufferedImage image, int buttonSize) {
+		Dimension buttonSizeDim = new Dimension(buttonSize, buttonSize);
+		Image scaledImg = image.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH);
+		button.setIcon(new ImageIcon(scaledImg));
+		button.setPreferredSize(buttonSizeDim);
+		button.setMinimumSize(buttonSizeDim);
+		button.setMaximumSize(buttonSizeDim);
+		button.setBorderPainted(false);
+		button.setContentAreaFilled(false);
+		button.setRolloverEnabled(false);
+		button.setFocusPainted(false);
+		button.addMouseListener(new MouseAdapter() {
+			private Graphics2D graphics2D;
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				int buttonSizePressed = (int) (buttonSize * 0.95);
+				Image imagePressed = image.getScaledInstance(buttonSizePressed, buttonSizePressed, Image.SCALE_SMOOTH);
+				BufferedImage newImage = new BufferedImage(buttonSizePressed, buttonSizePressed, BufferedImage.TYPE_INT_ARGB);
+				graphics2D = newImage.createGraphics();
+				graphics2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.85f));
+				graphics2D.drawImage(imagePressed, 0, 0, null);
+				button.setIcon(new ImageIcon(newImage));
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				Image imageReleased = image.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH);
+				button.setIcon(new ImageIcon(imageReleased));
+				graphics2D.dispose();
+			}
+		});
 	}
 
 }
