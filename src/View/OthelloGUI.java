@@ -2,17 +2,14 @@ package View;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Objects;
+import java.util.*;
 
 public class OthelloGUI extends JFrame {
-	private static final Image whiteImage, blackImage, greenFrameImage, iconImage;
+	private static final Image iconImage;
 	private static final Color backgroundColor = new Color(34, 139, 34);
 
 	static {
-		whiteImage = new ImageIcon(Objects.requireNonNull(OthelloGUI.class.getResource("/Assets/white.jpg"))).getImage();
-		blackImage = new ImageIcon(Objects.requireNonNull(OthelloGUI.class.getResource("/Assets/black.jpg"))).getImage();
-		greenFrameImage = new ImageIcon(Objects.requireNonNull(OthelloGUI.class.getResource("/Assets/greenFrame.jpg"))).getImage();
-		iconImage = new ImageIcon(Objects.requireNonNull(OthelloGUI.class.getResource("/Assets/icon.png"))).getImage();
+		iconImage = new ImageIcon(Objects.requireNonNull(OthelloGUI.class.getResource("../Assets/icon.png"))).getImage();
 	}
 
 	private final CardLayout cardLayout;
@@ -40,7 +37,7 @@ public class OthelloGUI extends JFrame {
 		cardPanel = new JPanel(cardLayout);
 		loadPanel = new LoadPanel(this);
 		homePanel = new HomePanel(this);
-		gamePanel = new GamePanel(this);
+		gamePanel = new GamePanel(this, 8);
 
 		cardPanel.add(loadPanel, "load");
 		cardPanel.add(homePanel, "home");
