@@ -17,24 +17,28 @@ class LoadPanel extends JPanel {
 	/** 背景画像のパス */
 	private static final String BACKGROUND_IMAGE_PATH = "/Assets/background.png";
 	/** 背景画像 */
-	private static final BufferedImage backgroundImage;
+	private static final BufferedImage BACKGROUND_IMAGE;
 	/** タイトルテキスト */
-	private static final String titleText = "Othello Game";
+	private static final String TITLE_TEXT = "Othello Game";
 	/** タイトルフォント */
-	private static final Font titleFont = new Font("Arial", Font.BOLD, 64);
+	private static final Font TITLE_FONT = new Font("Arial", Font.BOLD, 64);
 
 	static {
 		try {
-			backgroundImage = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream(BACKGROUND_IMAGE_PATH)));
+			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(LoadPanel.class.getResourceAsStream(BACKGROUND_IMAGE_PATH)));
 		} catch (final IOException | NullPointerException e) {
-			throw new RuntimeException("Failed to load button images", e);
+			throw new RuntimeException("Failed to load background image", e);
 		}
 	}
 
 	// --------------- フィールド ---------------
+	/** 親GUIへの参照 */
 	private final OthelloGUI gui;
+	/** プログレスバー */
 	private final JProgressBar progressBar;
+	/** アニメーション用タイマー */
 	private final Timer timer;
+	/** 現在の進捗値 */
 	private int progress = 0;
 
 	/**
@@ -67,7 +71,7 @@ class LoadPanel extends JPanel {
 	}
 
 	/**
-	 * ロード処理の開始
+	 * ロード処理を開始します。
 	 */
 	public void startProgress() {
 		progress = 0;
@@ -76,15 +80,16 @@ class LoadPanel extends JPanel {
 	}
 
 	/**
-	 * 背景画像と影付きタイトルの描画
+	 * 背景画像と影付きタイトルを描画します。
 	 */
+	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
 		int panelWidth = getWidth();
 		int panelHeight = getHeight();
-		int imageWidth = backgroundImage.getWidth();
-		int imageHeight = backgroundImage.getHeight();
+		int imageWidth = BACKGROUND_IMAGE.getWidth();
+		int imageHeight = BACKGROUND_IMAGE.getHeight();
 		double imageAspect = (double) imageWidth / imageHeight;
 		double panelAspect = (double) panelWidth / panelHeight;
 
@@ -92,40 +97,40 @@ class LoadPanel extends JPanel {
 		int drawWidth, drawHeight;
 		int imgX, imgY;
 		if (panelAspect > imageAspect) {
-			// パネルの方が横長 ? 横幅を合わせて縦をトリミング
+			// パネルの方が横長 → 横幅を合わせて縦をトリミング
 			drawWidth = panelWidth;
 			drawHeight = (int) (panelWidth / imageAspect);
 			imgX = 0;
 			imgY = (panelHeight - drawHeight) / 2;
 		} else {
-			// パネルの方が縦長 ? 縦幅を合わせて横をトリミング
+			// パネルの方が縦長 → 縦幅を合わせて横をトリミング
 			drawHeight = panelHeight;
 			drawWidth = (int) (panelHeight * imageAspect);
 			imgY = 0;
 			imgX = (panelWidth - drawWidth) / 2;
 		}
-		g.drawImage(backgroundImage, imgX, imgY, drawWidth, drawHeight, this); // アスペクト比を維持
+		g.drawImage(BACKGROUND_IMAGE, imgX, imgY, drawWidth, drawHeight, this);
 
 		// 影付き文字を描画
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g2d.setFont(titleFont);
+		g2d.setFont(TITLE_FONT);
 		FontMetrics fm = g2d.getFontMetrics();
-		int textWidth = fm.stringWidth(titleText);
+		int textWidth = fm.stringWidth(TITLE_TEXT);
 		int textX = (panelWidth - textWidth) / 2;
 		int textY = panelHeight / 2 - fm.getHeight() / 2 + fm.getAscent() - 50;
 
 		// 影の描画
 		g2d.setColor(new Color(0, 0, 0, 120));
-		g2d.drawString(titleText, textX + 3, textY + 3);
+		g2d.drawString(TITLE_TEXT, textX + 3, textY + 3);
 
 		// 文字の描画
 		g2d.setColor(Color.WHITE);
-		g2d.drawString(titleText, textX, textY);
+		g2d.drawString(TITLE_TEXT, textX, textY);
 	}
 
 	/**
-	 * プログレッスバーを更新します。
+	 * プログレスバーを更新します。
 	 */
 	private void updateProgress() {
 		progress++;

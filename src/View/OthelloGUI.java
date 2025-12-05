@@ -8,28 +8,30 @@ import java.net.*;
 import java.util.*;
 
 /**
- * オセロゲームのメインウィンドウを管理するクラス。
+ * オセロゲームのメインウィンドウを管理するクラスです。
  * CardLayoutを使用して画面の切り替えを行います。
  */
 public class OthelloGUI extends JFrame {
 	// --------------- クラス定数定義 ---------------
 	/** アプリケーションアイコンの画像 */
-	private static final Image iconImage;
+	private static final Image ICON_IMAGE;
 	/** アプリケーションアイコンの画像パス */
-	private static final String iconImagePath = "../Assets/icon.png";
+	private static final String ICON_IMAGE_PATH = "../Assets/icon.png";
+
 	static {
 		// iconは読み込み失敗してもアプリ動作には影響しないため、ログ出力のみで続行
 		Image image = null;
 		try {
-			URL imageUrl = OthelloGUI.class.getResource(iconImagePath);
-			image = ImageIO.read(Objects.requireNonNull(imageUrl, "Icon image not found: " + iconImagePath));
+			URL imageUrl = OthelloGUI.class.getResource(ICON_IMAGE_PATH);
+			image = ImageIO.read(Objects.requireNonNull(imageUrl, "Icon image not found: " + ICON_IMAGE_PATH));
 		} catch (final IOException e) {
 			System.err.println("Failed to load icon image file due to I/O error.");
 		} catch (final NullPointerException e) {
 			System.err.println(e.getMessage());
 		}
-		iconImage = image;
+		ICON_IMAGE = image;
 	}
+
 	// CardLayout用のパネル識別文字列
 	/** ロード画面の識別子 */
 	private static final String CARD_LOAD = "load";
@@ -57,7 +59,7 @@ public class OthelloGUI extends JFrame {
 	public OthelloGUI() {
 		// フレームの基本設定
 		setTitle("Othello");
-		if (iconImage != null) setIconImage(iconImage);
+		if (ICON_IMAGE != null) setIconImage(ICON_IMAGE);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		// 画面サイズの設定（デフォルト）
@@ -87,7 +89,7 @@ public class OthelloGUI extends JFrame {
 	}
 
 	/**
-	 * ロード画面の表示 + プログレッスバーの開始
+	 * ロード画面を表示し、プログレスバーを開始します。
 	 */
 	public void showLoad() {
 		cardLayout.show(cardPanel, CARD_LOAD);
@@ -95,14 +97,14 @@ public class OthelloGUI extends JFrame {
 	}
 
 	/**
-	 * ホーム画面の表示
+	 * ホーム画面を表示します。
 	 */
 	public void showHome() {
 		cardLayout.show(cardPanel, CARD_HOME);
 	}
 
 	/**
-	 * ゲーム画面の表示
+	 * ゲーム画面を表示します。
 	 */
 	public void showGame() {
 		cardLayout.show(cardPanel, CARD_GAME);
