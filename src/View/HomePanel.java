@@ -8,19 +8,27 @@ import java.awt.image.*;
 import java.io.*;
 import java.util.*;
 
-
+/**
+ * ゲームのホーム画面を表示するパネルです。
+ * 背景画像、タイトル、およびゲーム開始・終了ボタンを提供します。
+ */
 class HomePanel extends JPanel {
-	private static final BufferedImage startImage, finishImage;
+	// --------------- クラス定数定義 ---------------
+	private static final BufferedImage startImage, finishImage, backgroundImage;
+	private static final String titleText = "Othello Game";
+	private static final Font titleFont = new Font("Arial", Font.BOLD, 64);
 
 	static {
 		try {
 			startImage = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("/Assets/start2.png")));
 			finishImage = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("/Assets/finish2.png")));
+			backgroundImage = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("/Assets/background.png")));
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to load button images", e);
 		}
 	}
 
+	// --------------- フィールド ---------------
 	private final OthelloGUI gui;
 	private final JButton startButton, finishButton;
 
@@ -46,24 +54,13 @@ class HomePanel extends JPanel {
 		int buttonSize = Math.min(width / 6, height / 6);
 		prepareImages(buttonSize);
 
-		// タイトルの配置
-		JLabel titleLabel = new JLabel("Othello Game");
-		titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
-		titleLabel.setForeground(Color.WHITE);
-		gbc.insets = new Insets(10, 10, 200, 10);
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.gridwidth = 6;
-		gbc.gridheight = 1;
-		add(titleLabel, gbc);
-
 		// finishボタンの配置
 		finishButton = new JButton();
 		initButton(finishButton, finishIconNormal, finishIconPressed, buttonSize);
 		finishButton.addActionListener(e -> System.exit(0));
-		gbc.insets = new Insets(10, 200, 10, 10);
+		gbc.insets = new Insets(200, 200, 10, 10);
 		gbc.gridx = 1;
-		gbc.gridy = 1;
+		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 2;
 		add(finishButton, gbc);
@@ -72,12 +69,58 @@ class HomePanel extends JPanel {
 		startButton = new JButton();
 		initButton(startButton, startIconNormal, startIconPressed, buttonSize);
 		startButton.addActionListener(e -> gui.showGame());
-		gbc.insets = new Insets(10, 10, 10, 200);
+		gbc.insets = new Insets(200, 10, 10, 200);
 		gbc.gridx = 2;
-		gbc.gridy = 1;
+		gbc.gridy = 0;
 		gbc.gridwidth = 1;
 		gbc.gridheight = 2;
 		add(startButton, gbc);
+	}
+
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+
+		int panelWidth = getWidth();
+		int panelHeight = getHeight();
+		int imageWidth = backgroundImage.getWidth();
+		int imageHeight = backgroundImage.getHeight();
+		double imageAspect = (double) imageWidth / imageHeight;
+		double panelAspect = (double) panelWidth / panelHeight;
+
+		// 背景画像を描画
+		int drawWidth, drawHeight;
+		int imgX, imgY;
+		if (panelAspect > imageAspect) {
+			// パネルの方が横長 ? 横幅を合わせて縦をトリミング
+			drawWidth = panelWidth;
+			drawHeight = (int) (panelWidth / imageAspect);
+			imgX = 0;
+			imgY = (panelHeight - drawHeight) / 2;
+		} else {
+			// パネルの方が縦長 ? 縦幅を合わせて横をトリミング
+			drawHeight = panelHeight;
+			drawWidth = (int) (panelHeight * imageAspect);
+			imgY = 0;
+			imgX = (panelWidth - drawWidth) / 2;
+		}
+		g.drawImage(backgroundImage, imgX, imgY, drawWidth, drawHeight, this); // アスペクト比を維持
+
+		// 影付き文字を描画
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2d.setFont(titleFont);
+		FontMetrics fm = g2d.getFontMetrics();
+		int textWidth = fm.stringWidth(titleText);
+		int textX = (panelWidth - textWidth) / 2;
+		int textY = panelHeight / 3;
+
+		// 影の描画
+		g2d.setColor(new Color(0, 0, 0, 120));
+		g2d.drawString(titleText, textX + 3, textY + 3);
+
+		// 文字の描画
+		g2d.setColor(Color.WHITE);
+		g2d.drawString(titleText, textX, textY);
 	}
 
 	/**

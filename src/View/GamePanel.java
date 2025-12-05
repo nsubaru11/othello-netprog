@@ -27,36 +27,30 @@ class GamePanel extends JPanel {
 	private final int n;
 	private final OthelloGUI gui;
 	private final JButton[][] board;
-	private final Dimension cellSizeDim;
 
+	private int cellSize;
 	private ImageIcon whiteCellIcon;
 	private ImageIcon blackCellIcon;
 	private ImageIcon greenCellIcon;
+	private ComponentListener componentListener;
 
 	public GamePanel(final OthelloGUI gui, final int n) {
 		this.gui = gui;
 		this.n = n;
-
-		Dimension dimension = gui.getSize();
-		int width = dimension.width;
-		int height = dimension.height;
-		setSize(dimension);
 
 		// 画面構成の設定
 		setLayout(new GridBagLayout());
 		setBackground(gui.getBackground());
 		GridBagConstraints gbc = new GridBagConstraints();
 
-		int cellSize = Math.min(width / (n + 1), height / (n + 1));
-		cellSizeDim = new Dimension(cellSize, cellSize);
-		prepareImages(cellSize);
-
+		// 各セルの初期化
 		board = new JButton[n][n];
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				board[i][j] = new JButton();
 				initButton(i, j, greenCellIcon);
-				int left = j == 0 ? 10 : 0; // 端のマスには余白を挿入
+				// 端のマスには余白を挿入
+				int left = j == 0 ? 10 : 0;
 				int right = j == n - 1 ? 10 : 0;
 				gbc.insets = new Insets(0, left, 0, right);
 				gbc.gridx = j;
@@ -64,6 +58,17 @@ class GamePanel extends JPanel {
 				add(board[i][j], gbc);
 			}
 		}
+
+		// リスナーの作成
+		componentListener = new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				resizeBoard();
+			}
+		};
+		addComponentListener(componentListener);
+
+		resizeBoard();
 		int half = n / 2;
 		setPiece(half - 1, half - 1, Piece.BLACK);
 		setPiece(half - 1, half, Piece.WHITE);
@@ -71,13 +76,55 @@ class GamePanel extends JPanel {
 		setPiece(half, half, Piece.BLACK);
 	}
 
+	public void removeNotify() {
+		super.removeNotify();
+		removeComponentListener(componentListener);
+	}
+
+	private void resizeBoard() {
+		int width = getWidth(), height = getHeight();
+
+		// パネルが表示されていない、またはサイズが小さすぎる場合は何もしない
+		if (width <= 0 || height <= 0) return;
+
+		// 新しいセルサイズを計算 (余白を考慮して計算式はそのまま利用)
+		int newCellSize = Math.min(width / (n + 1), height / (n + 1));
+
+		// サイズが変更された場合のみ更新
+		if (newCellSize > 0 && newCellSize != cellSize) {
+			cellSize = newCellSize;
+			prepareImages(cellSize);
+			Dimension newDim = new Dimension(cellSize, cellSize);
+
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					JButton button = board[i][j];
+					button.setPreferredSize(newDim);
+					Piece piece = (Piece) button.getClientProperty(Piece.class);
+					if (piece == null) {
+						button.setIcon(greenCellIcon);
+					} else if (piece.isBlack()) {
+						button.setIcon(blackCellIcon);
+					} else if (piece.isWhite()) {
+						button.setIcon(whiteCellIcon);
+					} else {
+						button.setIcon(greenCellIcon);
+					}
+				}
+			}
+			revalidate();
+			repaint();
+		}
+	}
+
 	public void setPiece(int i, int j, Piece piece) {
+		board[i][j].putClientProperty(Piece.class, piece);
 		if (piece.isBlack()) {
 			board[i][j].setIcon(blackCellIcon);
 		} else if (piece.isWhite()) {
 			board[i][j].setIcon(whiteCellIcon);
 		} else {
-			System.err.println("Invalid piece");
+			board[i][j].setIcon(greenCellIcon);
 		}
 	}
 
@@ -96,34 +143,8 @@ class GamePanel extends JPanel {
 	 */
 	private void prepareImages(int cellSize) {
 		whiteCellIcon = new ImageIcon(whiteImage.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
-
 		blackCellIcon = new ImageIcon(blackImage.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
-
 		greenCellIcon = new ImageIcon(greenFrameImage.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
-	}
-
-	/**
-	 * 押下時の視覚効果用画像を生成
-	 * サイズ縮小と半透明化を適用
-	 *
-	 * @param source 元画像
-	 * @param size   縮小後のサイズ
-	 * @return 視覚効果が適用された画像
-	 */
-	private Image createPressedImage(BufferedImage source, int size) {
-		// リサイズされたImageオブジェクトの作成
-		Image scaled = source.getScaledInstance(size, size, Image.SCALE_SMOOTH);
-
-		// 画像の半透明化を行うためにBufferedImageクラスでラップ
-		BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-
-		// Graphics2Dで半透明化
-		Graphics2D g2d = result.createGraphics();
-		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.85f));
-		g2d.drawImage(scaled, 0, 0, null);
-		g2d.dispose();
-
-		return result;
 	}
 
 	/**
@@ -136,10 +157,8 @@ class GamePanel extends JPanel {
 	private void initButton(int i, int j, ImageIcon normalImage) {
 		JButton button = board[i][j];
 		// 諸々の設定（押下時にサイズ画像サイズにつられないようにとか、枠線を消したりとか）
+		button.putClientProperty(Piece.class, Piece.EMPTY);
 		button.setIcon(normalImage);
-		button.setPreferredSize(cellSizeDim);
-		button.setMinimumSize(cellSizeDim);
-		button.setMaximumSize(cellSizeDim);
 		button.setBorderPainted(false); // 枠線 = false
 		button.setContentAreaFilled(false); // ボタン領域を透明化
 		button.setFocusPainted(false); // 押下時の枠線の有無
@@ -153,7 +172,7 @@ class GamePanel extends JPanel {
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(final MouseEvent e) {
-				System.out.println("Cell(" + i + ", " + j + ")");
+				System.out.println("Cell(" + i + ", " + j + ", " + board[i][j].getClientProperty(Piece.class) + ")");
 			}
 
 			@Override
