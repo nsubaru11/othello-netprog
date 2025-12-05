@@ -1,5 +1,7 @@
 package View;
 
+import Model.*;
+
 import javax.imageio.*;
 import javax.swing.*;
 import java.awt.*;
@@ -7,6 +9,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 class GamePanel extends JPanel {
 	private static final BufferedImage whiteImage, blackImage, greenFrameImage;
@@ -21,15 +24,18 @@ class GamePanel extends JPanel {
 		}
 	}
 
+	private final int n;
 	private final OthelloGUI gui;
 	private final JButton[][] board;
+	private final Dimension cellSizeDim;
 
-	private ImageIcon whiteCellIcon, whiteCellIconPressed;
-	private ImageIcon blackCellIcon, blackCellIconPressed;
-	private ImageIcon greenCellIcon, greenCellIconPressed;
+	private ImageIcon whiteCellIcon;
+	private ImageIcon blackCellIcon;
+	private ImageIcon greenCellIcon;
 
 	public GamePanel(final OthelloGUI gui, final int n) {
 		this.gui = gui;
+		this.n = n;
 
 		Dimension dimension = gui.getSize();
 		int width = dimension.width;
@@ -41,21 +47,16 @@ class GamePanel extends JPanel {
 		setBackground(gui.getBackground());
 		GridBagConstraints gbc = new GridBagConstraints();
 
-		int buttonSize = Math.min(width / (n + 1), height / (n + 1));
-		prepareImages(buttonSize);
+		int cellSize = Math.min(width / (n + 1), height / (n + 1));
+		cellSizeDim = new Dimension(cellSize, cellSize);
+		prepareImages(cellSize);
 
 		board = new JButton[n][n];
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				board[i][j] = new JButton();
-				initButton(
-						board[i][j],
-						greenCellIcon,
-						greenCellIconPressed,
-						buttonSize
-				);
-
-				int left = j == 0 ? 10 : 0;
+				initButton(i, j, greenCellIcon);
+				int left = j == 0 ? 10 : 0; // 端のマスには余白を挿入
 				int right = j == n - 1 ? 10 : 0;
 				gbc.insets = new Insets(0, left, 0, right);
 				gbc.gridx = j;
@@ -63,24 +64,42 @@ class GamePanel extends JPanel {
 				add(board[i][j], gbc);
 			}
 		}
+		int half = n / 2;
+		setPiece(half - 1, half - 1, Piece.BLACK);
+		setPiece(half - 1, half, Piece.WHITE);
+		setPiece(half, half - 1, Piece.WHITE);
+		setPiece(half, half, Piece.BLACK);
 	}
 
+	public void setPiece(int i, int j, Piece piece) {
+		if (piece.isBlack()) {
+			board[i][j].setIcon(blackCellIcon);
+		} else if (piece.isWhite()) {
+			board[i][j].setIcon(whiteCellIcon);
+		} else {
+			System.err.println("Invalid piece");
+		}
+	}
+
+	public void setPieces(Piece piece, List<Integer> pieces) {
+		for (int ij : pieces) {
+			int i = ij / n, j = ij % n;
+			setPiece(i, j, piece);
+		}
+	}
 
 	/**
 	 * ボタン用の画像を事前生成してキャッシュ
 	 * パフォーマンス最適化のため、クリックごとの画像生成を回避
 	 *
-	 * @param buttonSize ボタンサイズ
+	 * @param cellSize ボタンサイズ
 	 */
-	private void prepareImages(int buttonSize) {
-		whiteCellIcon = new ImageIcon(whiteImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH));
-		whiteCellIconPressed = new ImageIcon(createPressedImage(whiteImage, buttonSize));
+	private void prepareImages(int cellSize) {
+		whiteCellIcon = new ImageIcon(whiteImage.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
 
-		blackCellIcon = new ImageIcon(blackImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH));
-		blackCellIconPressed = new ImageIcon(createPressedImage(blackImage, buttonSize));
+		blackCellIcon = new ImageIcon(blackImage.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
 
-		greenCellIcon = new ImageIcon(greenFrameImage.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH));
-		greenCellIconPressed = new ImageIcon(createPressedImage(greenFrameImage, buttonSize));
+		greenCellIcon = new ImageIcon(greenFrameImage.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
 	}
 
 	/**
@@ -110,19 +129,17 @@ class GamePanel extends JPanel {
 	/**
 	 * ボタンの初期化
 	 *
-	 * @param button       初期化対象
+	 * @param i 初期化するセルの i 座標
+	 * @param j 初期化するセルの j 座標
 	 * @param normalImage  通常時の画像
-	 * @param pressedImage 押下時の画像
-	 * @param buttonSize   ボタンサイズ
 	 */
-	private void initButton(JButton button, ImageIcon normalImage, ImageIcon pressedImage, int buttonSize) {
-		Dimension size = new Dimension(buttonSize, buttonSize);
-
+	private void initButton(int i, int j, ImageIcon normalImage) {
+		JButton button = board[i][j];
 		// 諸々の設定（押下時にサイズ画像サイズにつられないようにとか、枠線を消したりとか）
 		button.setIcon(normalImage);
-		button.setPreferredSize(size);
-		button.setMinimumSize(size);
-		button.setMaximumSize(size);
+		button.setPreferredSize(cellSizeDim);
+		button.setMinimumSize(cellSizeDim);
+		button.setMaximumSize(cellSizeDim);
 		button.setBorderPainted(false); // 枠線 = false
 		button.setContentAreaFilled(false); // ボタン領域を透明化
 		button.setFocusPainted(false); // 押下時の枠線の有無
@@ -136,12 +153,12 @@ class GamePanel extends JPanel {
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(final MouseEvent e) {
-				button.setIcon(pressedImage);
+				System.out.println("Cell(" + i + ", " + j + ")");
 			}
 
 			@Override
 			public void mouseReleased(final MouseEvent e) {
-				button.setIcon(normalImage);
+				// todo: コントローラーに伝達
 			}
 		});
 	}
