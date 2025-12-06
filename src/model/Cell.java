@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 public final class Cell {
 	private Piece piece;

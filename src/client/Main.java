@@ -1,4 +1,6 @@
-import View.*;
+package client;
+
+import client.view.*;
 
 import javax.swing.*;
 

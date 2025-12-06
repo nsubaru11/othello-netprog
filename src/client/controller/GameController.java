@@ -1,8 +1,6 @@
-package Controller;
+package client.controller;
 
-import Model.Board;
-import Model.Piece;
-import Network.NetworkController;
+import model.*;
 
 import java.util.*;
 
@@ -12,15 +10,24 @@ public class GameController {
 	private NetworkController networkController;
 	private Piece currentTurn;
 	private Map<Integer, List<Integer>> validCells;
+	private final int boardSize;
+	private final String host, playerName;
+	private final int port;
 
-	public GameController(int boardSize, String host, int port, String playerName) {
+	public GameController(int boardSize, String playerName) {
+		this.boardSize = boardSize;
+		this.host = "localhost";
+		this.playerName = playerName;
+		this.port = 8080;
 		this.board = new Board(boardSize);
 		networkController = new NetworkController(this);
-		boolean connected = networkController.connect(host, port, playerName, boardSize);
-		if (!connected) throw new RuntimeException("Failed to connect to server");
 
 		// サーバーからの色割り当て待ち
 		// myColor は onGameStart() で設定される
+	}
+
+	public boolean connect() {
+		return networkController.connect(host, port, playerName, boardSize);
 	}
 
 	public void setPiece(int row, int col) {

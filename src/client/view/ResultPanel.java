@@ -1,4 +1,4 @@
-package View;
+package client.view;
 
 import javax.imageio.*;
 import javax.swing.*;
@@ -26,8 +26,8 @@ class ResultPanel extends JPanel {
 
 	static {
 		try {
-			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("/Assets/background.png")));
-			HOME_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("/Assets/start2.png")));
+			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("/assets/background.png")));
+			HOME_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("/assets/start2.png")));
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to load result panel images", e);
 		}

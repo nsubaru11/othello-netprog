@@ -1,4 +1,4 @@
-package Model;
+package model;
 
 public enum Piece {
 	BLACK, WHITE, EMPTY;

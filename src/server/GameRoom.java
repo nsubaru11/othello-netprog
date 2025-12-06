@@ -1,10 +1,8 @@
-package Network;
+package server;
 
-import Model.Board;
-import Model.Piece;
+import model.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameRoom {
 	private static int roomIdCounter = 0;
@@ -16,37 +14,25 @@ public class GameRoom {
 	private Piece currentTurn;
 	private boolean gameStarted = false;
 
-	public GameRoom(int boardSize) {
+	public GameRoom(int boardSize, ClientHandler player1, ClientHandler player2) {
 		this.roomId = roomIdCounter++;
 		this.board = new Board(boardSize);
 		this.currentTurn = Piece.BLACK;
-	}
-
-	public boolean addPlayer(ClientHandler player) {
-		if (player1 == null) {
-			player1 = player;
-			player.setGameRoom(this);
-			player.setPlayerColor(Piece.BLACK);
-			player.sendMessage("WAITING");
-			return true;
-		} else if (player2 == null) {
-			player2 = player;
-			player.setGameRoom(this);
-			player.setPlayerColor(Piece.WHITE);
-			startGame();
-			return true;
-		}
-		return false; // 部屋が満員
+		this.player1 = player1;
+		player1.setGameRoom(this);
+		player1.setPlayerColor(Piece.BLACK);
+		this.player2 = player2;
+		player2.setGameRoom(this);
+		player2.setPlayerColor(Piece.WHITE);
+		startGame();
 	}
 
 	private void startGame() {
 		gameStarted = true;
 
-		// 両プレイヤーにゲーム開始通知
 		player1.sendMessage("GAME_START BLACK");
 		player2.sendMessage("GAME_START WHITE");
 
-		// 黒のターン通知
 		player1.sendMessage("YOUR_TURN");
 		player2.sendMessage("OPPONENT_TURN");
 

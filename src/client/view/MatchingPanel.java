@@ -1,4 +1,4 @@
-package View;
+package client.view;
 
 import javax.swing.*;
 import javax.swing.border.*;
@@ -200,15 +200,16 @@ class MatchingPanel extends JPanel {
 		String userName = userNameField.getText().trim();
 		if (userName.isEmpty()) {
 			JOptionPane.showMessageDialog(this,
-					"Please enter your user name.",
-					"Input Error",
+					"ユーザー名を入力してください。",
+					"入力エラー",
 					JOptionPane.WARNING_MESSAGE);
 			return;
 		}
-
 		Integer selectedSize = (Integer) boardSizeComboBox.getSelectedItem();
 		int boardSize = selectedSize != null ? selectedSize : 8;
-		gui.startGame(userName, boardSize);
+		startButton.setEnabled(false);
+		boolean start = gui.startGame(userName, boardSize);
+		if (!start) startButton.setEnabled(true);
 	}
 
 	/**

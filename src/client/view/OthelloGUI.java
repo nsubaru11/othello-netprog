@@ -1,6 +1,6 @@
-package View;
+package client.view;
 
-import Controller.*;
+import client.controller.*;
 
 import javax.imageio.*;
 import javax.swing.*;
@@ -53,12 +53,12 @@ public class OthelloGUI extends JFrame {
 	private final LoadPanel loadPanel;
 	/** ホーム画面パネル */
 	private final HomePanel homePanel;
-	/** ゲーム画面パネル */
-	private final GamePanel gamePanel;
 	/** 結果画面パネル */
 	private final ResultPanel resultPanel;
 	/** マッチング設定パネル */
 	private final MatchingPanel matchingPanel;
+	/** ゲーム画面パネル */
+	private GamePanel gamePanel;
 	/** ゲームコントローラー */
 	private GameController controller;
 
@@ -85,20 +85,22 @@ public class OthelloGUI extends JFrame {
 		cardPanel = new JPanel(cardLayout);
 		loadPanel = new LoadPanel(this);
 		homePanel = new HomePanel(this);
-		gamePanel = new GamePanel(this, 8);
 		resultPanel = new ResultPanel(this);
 		matchingPanel = new MatchingPanel(this);
 
 		// CardLayoutにパネルを追加
 		cardPanel.add(loadPanel, CARD_LOAD);
 		cardPanel.add(homePanel, CARD_HOME);
-		cardPanel.add(gamePanel, CARD_GAME);
 		cardPanel.add(resultPanel, CARD_RESULT);
 		add(cardPanel);
 
 		// ウィンドウを表示し、ロード画面を開始する
 		setVisible(true);
 		showLoad();
+	}
+
+	public GameController getController() {
+		return controller;
 	}
 
 	/**
@@ -160,11 +162,16 @@ public class OthelloGUI extends JFrame {
 	 *
 	 * @param userName  ユーザー名
 	 * @param boardSize ボードサイズ
+	 * @return ゲーム開始に成功したかどうか
 	 */
-	public void startGame(String userName, int boardSize) {
+	public boolean startGame(String userName, int boardSize) {
 		hideMatchingPanel();
-		// TODO: GamePanelを新しいボードサイズで再作成するか、動的にサイズ変更する
-		// controller = new GameController();
+		controller = new GameController(boardSize, userName);
+		gamePanel = new GamePanel(this, boardSize);
+		cardPanel.add(gamePanel, CARD_GAME);
+		boolean connect = controller.connect();
+		if (!connect) return false;
 		cardLayout.show(cardPanel, CARD_GAME);
+		return true;
 	}
 }

@@ -1,6 +1,6 @@
-package View;
+package client.view;
 
-import Model.*;
+import model.*;
 
 import javax.imageio.*;
 import javax.swing.*;
@@ -28,10 +28,10 @@ class GamePanel extends JPanel {
 
 	static {
 		try {
-			WHITE_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/Assets/white.jpg")));
-			BLACK_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/Assets/black.jpg")));
-			GREEN_FRAME_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/Assets/greenFrame.jpg")));
-			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResourceAsStream("/Assets/background.png")));
+			WHITE_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/assets/white.jpg")));
+			BLACK_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/assets/black.jpg")));
+			GREEN_FRAME_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/assets/greenFrame.jpg")));
+			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResourceAsStream("/assets/background.png")));
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to load cell images", e);
 		}

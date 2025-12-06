@@ -1,10 +1,9 @@
-package Network;
+package client.controller;
 
-import Controller.GameController;
-import Model.Piece;
+import model.*;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 import java.util.*;
 
 public class NetworkController {
@@ -23,7 +22,7 @@ public class NetworkController {
 			socket = new Socket(host, port);
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out.println("CONNECT " + playerName);
+			out.println("CONNECT " + playerName + " " + boardSize);
 			out.flush();
 			receiveThread = new MessageReceiveThread();
 			receiveThread.start();

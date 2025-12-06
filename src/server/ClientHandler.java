@@ -1,9 +1,9 @@
-package Network;
+package server;
 
-import Model.Piece;
+import model.*;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.*;
 
 public class ClientHandler extends Thread {
 	private Socket socket;
@@ -35,7 +35,7 @@ public class ClientHandler extends Thread {
 				System.out.println("Player connected: " + playerName);
 
 				// マッチング待ちキューに追加
-				server.addWaitingPlayer(this);
+				server.addWaitingPlayer(8, this);
 			}
 
 			// メッセージ受信ループ
