@@ -27,9 +27,9 @@ class HomePanel extends JPanel {
 
 	static {
 		try {
-			START_IMAGE = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("/assets/start2.png")));
-			FINISH_IMAGE = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("/assets/finish2.png")));
-			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("/assets/background.png")));
+			START_IMAGE = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("../assets/start2.png")));
+			FINISH_IMAGE = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("../assets/finish2.png")));
+			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(HomePanel.class.getResourceAsStream("../assets/background.png")));
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to load button images", e);
 		}

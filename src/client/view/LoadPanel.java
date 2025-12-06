@@ -15,7 +15,7 @@ import java.util.*;
 class LoadPanel extends JPanel {
 	// --------------- クラス定数定義 ---------------
 	/** 背景画像のパス */
-	private static final String BACKGROUND_IMAGE_PATH = "/assets/background.png";
+	private static final String BACKGROUND_IMAGE_PATH = "../assets/background.png";
 	/** 背景画像 */
 	private static final BufferedImage BACKGROUND_IMAGE;
 	/** タイトルテキスト */

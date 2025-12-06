@@ -18,7 +18,7 @@ public class OthelloGUI extends JFrame {
 	/** アプリケーションアイコンの画像 */
 	private static final Image ICON_IMAGE;
 	/** アプリケーションアイコンの画像パス */
-	private static final String ICON_IMAGE_PATH = "../Assets/icon.png";
+	private static final String ICON_IMAGE_PATH = "../assets/icon.png";
 
 	static {
 		// iconは読み込み失敗してもアプリ動作には影響しないため、ログ出力のみで続行
