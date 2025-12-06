@@ -158,30 +158,12 @@ class HomePanel extends JPanel {
 		int pressedSize = (int) (buttonSize * 0.95);
 
 		// スタート画像の生成
-		startIconNormal = new ImageIcon(scaleImage(START_IMAGE, buttonSize, buttonSize));
+		startIconNormal = new ImageIcon(START_IMAGE.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH));
 		startIconPressed = new ImageIcon(createPressedImage(START_IMAGE, pressedSize));
 
 		// 終了画像の生成
-		finishIconNormal = new ImageIcon(scaleImage(FINISH_IMAGE, buttonSize, buttonSize));
+		finishIconNormal = new ImageIcon(FINISH_IMAGE.getScaledInstance(buttonSize, buttonSize, Image.SCALE_SMOOTH));
 		finishIconPressed = new ImageIcon(createPressedImage(FINISH_IMAGE, pressedSize));
-	}
-
-	/**
-	 * 画像を指定サイズにスケーリングします。
-	 * Graphics2Dを使用してgetScaledInstanceより高速に処理します。
-	 *
-	 * @param source 元画像
-	 * @param width  スケーリング後の幅
-	 * @param height スケーリング後の高さ
-	 * @return スケーリングされた画像
-	 */
-	private BufferedImage scaleImage(BufferedImage source, int width, int height) {
-		BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = scaled.createGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g2d.drawImage(source, 0, 0, width, height, null);
-		g2d.dispose();
-		return scaled;
 	}
 
 	/**
@@ -192,8 +174,8 @@ class HomePanel extends JPanel {
 	 * @param size   縮小後のサイズ
 	 * @return 視覚効果が適用された画像
 	 */
-	private BufferedImage createPressedImage(BufferedImage source, int size) {
-		BufferedImage scaled = scaleImage(source, size, size);
+	private Image createPressedImage(BufferedImage source, int size) {
+		Image scaled = source.getScaledInstance(size, size, Image.SCALE_SMOOTH);
 		BufferedImage result = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = result.createGraphics();
 		g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.85f));

@@ -23,12 +23,15 @@ class GamePanel extends JPanel {
 	private static final BufferedImage BLACK_IMAGE;
 	/** 空きマスの画像 */
 	private static final BufferedImage GREEN_FRAME_IMAGE;
+	/** 背景画像 */
+	private static final BufferedImage BACKGROUND_IMAGE;
 
 	static {
 		try {
 			WHITE_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/Assets/white.jpg")));
 			BLACK_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/Assets/black.jpg")));
 			GREEN_FRAME_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("/Assets/greenFrame.jpg")));
+			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResourceAsStream("/Assets/background.png")));
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to load cell images", e);
 		}
@@ -182,33 +185,48 @@ class GamePanel extends JPanel {
 	}
 
 	/**
+	 * 背景画像を描画します。
+	 */
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+
+		int panelWidth = getWidth();
+		int panelHeight = getHeight();
+		int imageWidth = BACKGROUND_IMAGE.getWidth();
+		int imageHeight = BACKGROUND_IMAGE.getHeight();
+		double imageAspect = (double) imageWidth / imageHeight;
+		double panelAspect = (double) panelWidth / panelHeight;
+
+		// 背景画像を描画
+		int drawWidth, drawHeight;
+		int imgX, imgY;
+		if (panelAspect > imageAspect) {
+			// パネルの方が横長 → 横幅を合わせて縦をトリミング
+			drawWidth = panelWidth;
+			drawHeight = (int) (panelWidth / imageAspect);
+			imgX = 0;
+			imgY = (panelHeight - drawHeight) / 2;
+		} else {
+			// パネルの方が縦長 → 縦幅を合わせて横をトリミング
+			drawHeight = panelHeight;
+			drawWidth = (int) (panelHeight * imageAspect);
+			imgY = 0;
+			imgX = (panelWidth - drawWidth) / 2;
+		}
+		g.drawImage(BACKGROUND_IMAGE, imgX, imgY, drawWidth, drawHeight, this);
+	}
+
+	/**
 	 * ボタン用の画像を事前生成してキャッシュします。
 	 * パフォーマンス最適化のため、クリックごとの画像生成を回避します。
 	 *
 	 * @param cellSize ボタンサイズ
 	 */
 	private void prepareImages(int cellSize) {
-		whiteCellIcon = new ImageIcon(scaleImage(WHITE_IMAGE, cellSize, cellSize));
-		blackCellIcon = new ImageIcon(scaleImage(BLACK_IMAGE, cellSize, cellSize));
-		greenCellIcon = new ImageIcon(scaleImage(GREEN_FRAME_IMAGE, cellSize, cellSize));
-	}
-
-	/**
-	 * 画像を指定サイズにスケーリングします。
-	 * Graphics2Dを使用してgetScaledInstanceより高速に処理します。
-	 *
-	 * @param source 元画像
-	 * @param width  スケーリング後の幅
-	 * @param height スケーリング後の高さ
-	 * @return スケーリングされた画像
-	 */
-	private BufferedImage scaleImage(BufferedImage source, int width, int height) {
-		BufferedImage scaled = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g2d = scaled.createGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g2d.drawImage(source, 0, 0, width, height, null);
-		g2d.dispose();
-		return scaled;
+		whiteCellIcon = new ImageIcon(WHITE_IMAGE.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
+		blackCellIcon = new ImageIcon(BLACK_IMAGE.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
+		greenCellIcon = new ImageIcon(GREEN_FRAME_IMAGE.getScaledInstance(cellSize, cellSize, Image.SCALE_SMOOTH));
 	}
 
 	/**
