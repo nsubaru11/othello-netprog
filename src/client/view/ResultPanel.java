@@ -21,13 +21,11 @@ class ResultPanel extends JPanel {
 	private static final Font TITLE_FONT = new Font("Arial", Font.BOLD, 72);
 	/** スコア表示フォント */
 	private static final Font SCORE_FONT = new Font("Arial", Font.BOLD, 48);
-	/** メッセージフォント */
-	private static final Font MESSAGE_FONT = new Font("Arial", Font.PLAIN, 24);
 
 	static {
 		try {
 			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("../assets/background.png")));
-			HOME_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("../assets/start2.png")));
+			HOME_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("../assets/start.png")));
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to load result panel images", e);
 		}
@@ -47,8 +45,10 @@ class ResultPanel extends JPanel {
 	private int blackCount = 0;
 	/** 白の駒数 */
 	private int whiteCount = 0;
-	/** 勝者（"BLACK", "WHITE", "DRAW"） */
-	private String winner = "";
+	/**
+	 * 結果（"WIN", "LOSE", "DRAW"）
+	 */
+	private String result = "";
 
 	/**
 	 * ResultPanelを構築します。
@@ -90,17 +90,10 @@ class ResultPanel extends JPanel {
 	 * @param blackCount 黒の駒数
 	 * @param whiteCount 白の駒数
 	 */
-	public void setResult(int blackCount, int whiteCount) {
+	public void setResult(String result, int blackCount, int whiteCount) {
+		this.result = result;
 		this.blackCount = blackCount;
 		this.whiteCount = whiteCount;
-
-		if (blackCount > whiteCount) {
-			this.winner = "BLACK";
-		} else if (whiteCount > blackCount) {
-			this.winner = "WHITE";
-		} else {
-			this.winner = "DRAW";
-		}
 		repaint();
 	}
 
@@ -140,12 +133,12 @@ class ResultPanel extends JPanel {
 
 		// 勝者タイトルの描画
 		String titleText;
-		switch (winner) {
-			case "BLACK":
-				titleText = "Black Wins!";
+		switch (result) {
+			case "WIN":
+				titleText = "You Win!";
 				break;
-			case "WHITE":
-				titleText = "White Wins!";
+			case "LOSE":
+				titleText = "You Lose!";
 				break;
 			case "DRAW":
 				titleText = "Draw!";
@@ -166,12 +159,12 @@ class ResultPanel extends JPanel {
 
 		// タイトル文字の描画（勝者に応じた色）
 		Color titleColor;
-		switch (winner) {
-			case "BLACK":
-				titleColor = new Color(50, 50, 50);
+		switch (result) {
+			case "WIN":
+				titleColor = Color.RED;
 				break;
-			case "WHITE":
-				titleColor = Color.WHITE;
+			case "LOSE":
+				titleColor = Color.BLUE;
 				break;
 			default:
 				titleColor = new Color(255, 215, 0);
@@ -195,17 +188,6 @@ class ResultPanel extends JPanel {
 		// スコア文字の描画
 		g2d.setColor(Color.WHITE);
 		g2d.drawString(scoreText, textX, textY);
-
-		// メッセージの描画
-		String messageText = "Click the button to return to home";
-		g2d.setFont(MESSAGE_FONT);
-		fm = g2d.getFontMetrics();
-		textWidth = fm.stringWidth(messageText);
-		textX = (panelWidth - textWidth) / 2;
-		textY = panelHeight / 4 + 140;
-
-		g2d.setColor(new Color(255, 255, 255, 200));
-		g2d.drawString(messageText, textX, textY);
 	}
 
 	/**

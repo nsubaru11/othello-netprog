@@ -34,6 +34,10 @@ public class GameController implements NetworkListener {
 		System.out.println("Move sent: (" + row + ", " + col + ")");
 	}
 
+	public void giveUp() {
+		networkController.sendResign();
+	}
+
 	public void onGameStart(Piece assignedColor) {
 		this.myColor = assignedColor;
 		this.currentTurn = Piece.BLACK;
@@ -67,7 +71,7 @@ public class GameController implements NetworkListener {
 
 	public void onGameOver(String result, int blackCount, int whiteCount) {
 		System.out.println(result + " " + blackCount + " - " + whiteCount);
-		SwingUtilities.invokeLater(() -> gui.showMessage(result + ": " + blackCount + " - " + whiteCount));
+		SwingUtilities.invokeLater(() -> gui.showResult(result, blackCount, whiteCount));
 	}
 
 	public void onNetworkError(String message) {

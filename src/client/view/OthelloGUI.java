@@ -136,8 +136,8 @@ public class OthelloGUI extends JFrame {
 	 * @param blackCount 黒の駒数
 	 * @param whiteCount 白の駒数
 	 */
-	public void showResult(int blackCount, int whiteCount) {
-		resultPanel.setResult(blackCount, whiteCount);
+	public void showResult(String result, int blackCount, int whiteCount) {
+		resultPanel.setResult(result, blackCount, whiteCount);
 		cardLayout.show(cardPanel, CARD_RESULT);
 	}
 

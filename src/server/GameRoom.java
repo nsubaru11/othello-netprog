@@ -116,7 +116,9 @@ public class GameRoom {
 		ClientHandler opponent = player == player1 ? player2 : player1;
 		if (opponent != null) {
 			opponent.sendMessage("OPPONENT_DISCONNECTED");
-			opponent.sendMessage("GAME_OVER WIN");
+			int blackCount = board.getStoneCount(Piece.BLACK);
+			int whiteCount = board.getStoneCount(Piece.WHITE);
+			opponent.sendMessage("GAME_OVER WIN " + blackCount + " " + whiteCount);
 		}
 
 		System.out.println("Player disconnected from room " + roomId);
