@@ -25,7 +25,7 @@ class ResultPanel extends JPanel {
 	static {
 		try {
 			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("../assets/background.png")));
-			HOME_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("../assets/start.png")));
+			HOME_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("../assets/home.png")));
 		} catch (final IOException e) {
 			throw new RuntimeException("Failed to load result panel images", e);
 		}
@@ -70,7 +70,7 @@ class ResultPanel extends JPanel {
 		GridBagConstraints gbc = new GridBagConstraints();
 
 		// ボタンサイズの計算
-		int buttonSize = Math.min(width / 8, height / 8);
+		int buttonSize = Math.min(width / 6, height / 6);
 		prepareImages(buttonSize);
 
 		// ホームボタンの配置
