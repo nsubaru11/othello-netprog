@@ -27,11 +27,11 @@ public class GameController implements NetworkListener {
 		return networkController.connect(playerName, boardSize);
 	}
 
-	public void setPiece(int row, int col) {
+	public void setPiece(int i, int j) {
 		if (currentTurn != myColor) return;
-		if (!board.canSet(currentTurn, row, col)) return;
-		networkController.sendMove(row, col);
-		System.out.println("Move sent: (" + row + ", " + col + ")");
+		if (!board.canSet(currentTurn, i, j)) return;
+		networkController.sendMove(i, j);
+		System.out.println("手を送信: (" + i + ", " + j + ")");
 	}
 
 	public void giveUp() {
@@ -41,26 +41,26 @@ public class GameController implements NetworkListener {
 	public void onGameStart(Piece assignedColor) {
 		this.myColor = assignedColor;
 		this.currentTurn = Piece.BLACK;
-		System.out.println("Game started! You are " + myColor);
-		SwingUtilities.invokeLater(() -> gui.showMessage("Game started! You are " + myColor));
+		System.out.println("ゲーム開始！あなたは " + myColor);
+		SwingUtilities.invokeLater(() -> gui.showMessage("Game started！ You are " + myColor));
 	}
 
 	public void onYourTurn() {
 		this.currentTurn = myColor;
-		System.out.println("Your turn!");
-		SwingUtilities.invokeLater(() -> gui.showMessage("Your turn! Your color is " + myColor));
+		System.out.println("あなたのターン！");
+		SwingUtilities.invokeLater(() -> gui.showMessage("Your turn！ Your color is " + myColor));
 	}
 
 	public void onOpponentTurn() {
 		this.currentTurn = myColor == Piece.BLACK ? Piece.WHITE : Piece.BLACK;
-		System.out.println("Opponent's turn");
+		System.out.println("相手のターン");
 		SwingUtilities.invokeLater(() -> gui.showMessage("Opponent's turn"));
 	}
 
-	public void onMoveAccepted(int row, int col) {
-		System.out.println("Move accepted: (" + row + ", " + col + ")");
-		placePiece(row, col);
-		List<Integer> validCells = board.getValidCells(currentTurn).get(row * boardSize + col);
+	public void onMoveAccepted(int i, int j) {
+		System.out.println("手が受理されました: (" + i + ", " + j + ")");
+		placePiece(i, j);
+		List<Integer> validCells = board.getValidCells(currentTurn).get(i * boardSize + j);
 		for (int cell : validCells) {
 			int ni = cell / boardSize;
 			int nj = cell % boardSize;
@@ -75,19 +75,19 @@ public class GameController implements NetworkListener {
 	}
 
 	public void onNetworkError(String message) {
-		System.err.println("Network error: " + message);
+		System.err.println("ネットワークエラー: " + message);
 		SwingUtilities.invokeLater(() -> gui.showMessage("Network error: " + message));
 	}
 
-	private void placePiece(int row, int col) {
+	private void placePiece(int i, int j) {
 		// この代入式を消すとバグる（SwingUtilitiesは処理を後回しにするから、先に通信が終わってcurrentTurnが更新されてしまう。）
 		Piece piece = currentTurn;
 		if (piece.isBlack()) {
-			board.placeBlack(row, col);
-			SwingUtilities.invokeLater(() -> gui.setPiece(piece, row, col));
+			board.placeBlack(i, j);
+			SwingUtilities.invokeLater(() -> gui.setPiece(piece, i, j));
 		} else {
-			board.placeWhite(row, col);
-			SwingUtilities.invokeLater(() -> gui.setPiece(piece, row, col));
+			board.placeWhite(i, j);
+			SwingUtilities.invokeLater(() -> gui.setPiece(piece, i, j));
 		}
 	}
 

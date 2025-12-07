@@ -27,7 +27,7 @@ class LoadPanel extends JPanel {
 		try {
 			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(LoadPanel.class.getResourceAsStream(BACKGROUND_IMAGE_PATH)));
 		} catch (final IOException | NullPointerException e) {
-			throw new RuntimeException("Failed to load background image", e);
+			throw new RuntimeException("背景画像の読み込みに失敗しました", e);
 		}
 	}
 

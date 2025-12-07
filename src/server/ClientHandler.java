@@ -30,7 +30,7 @@ public class ClientHandler extends Thread {
 			if (firstLine[0].equals("CONNECT")) {
 				playerName = firstLine[1];
 				int boardSize = Integer.parseInt(firstLine[2]);
-				System.out.println("Player connected: " + playerName);
+				System.out.println("プレイヤー接続: " + playerName);
 
 				// マッチング待ちキューに追加
 				server.addWaitingPlayer(boardSize, this);
@@ -40,11 +40,11 @@ public class ClientHandler extends Thread {
 			while (true) {
 				String line = in.readLine();
 				if (line == null) break;
-				System.out.println("From " + playerName + ": " + line);
+				System.out.println(playerName + " からの受信: " + line);
 				handleMessage(line);
 			}
 		} catch (IOException e) {
-			System.out.println("Connection error with " + playerName);
+			System.out.println(playerName + " との接続エラー");
 		} finally {
 			handleDisconnect();
 		}
@@ -56,9 +56,9 @@ public class ClientHandler extends Thread {
 
 		switch (command) {
 			case "MOVE":
-				int row = Integer.parseInt(tokens[1]);
-				int col = Integer.parseInt(tokens[2]);
-				gameRoom.processMove(row, col);
+				int i = Integer.parseInt(tokens[1]);
+				int j = Integer.parseInt(tokens[2]);
+				gameRoom.processMove(i, j);
 				break;
 
 			case "RESIGN":
@@ -66,12 +66,12 @@ public class ClientHandler extends Thread {
 				break;
 
 			default:
-				System.out.println("Unknown command: " + command);
+				System.out.println("不明なコマンド: " + command);
 		}
 	}
 
-	public void sendMessage(String msg) {
-		out.println(msg);
+	public void sendMessage(String message) {
+		out.println(message);
 		out.flush();
 	}
 
@@ -94,7 +94,7 @@ public class ClientHandler extends Thread {
 	private void handleDisconnect() {
 		if (gameRoom != null) gameRoom.handleDisconnect(this);
 		else server.disconnectPlayer(this);
-		System.out.println("Player disconnected: " + playerName);
+		System.out.println("プレイヤー切断: " + playerName);
 		close();
 	}
 }

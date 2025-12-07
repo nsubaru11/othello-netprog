@@ -9,7 +9,7 @@ public interface NetworkListener {
 
 	void onOpponentTurn();
 
-	void onMoveAccepted(int row, int col);
+	void onMoveAccepted(int i, int j);
 
 	void onGameOver(String result, int blackCount, int whiteCount);
 

@@ -33,8 +33,8 @@ public class NetworkController {
 		}
 	}
 
-	public void sendMove(int row, int col) {
-		out.println("MOVE " + row + " " + col);
+	public void sendMove(int i, int j) {
+		out.println("MOVE " + i + " " + j);
 		out.flush();
 	}
 
@@ -57,7 +57,7 @@ public class NetworkController {
 
 		switch (command) {
 			case "GAME_START":
-				// GAME_START BLACK or GAME_START WHITE
+				// GAME_START BLACK または GAME_START WHITE
 				Piece color = Piece.valueOf(tokens[1]);
 				networkListener.onGameStart(color);
 				break;
@@ -71,25 +71,25 @@ public class NetworkController {
 				break;
 
 			case "MOVE_ACCEPTED":
-				// MOVE_ACCEPTED row col
-				int row = Integer.parseInt(tokens[1]);
-				int col = Integer.parseInt(tokens[2]);
-				networkListener.onMoveAccepted(row, col);
+				// MOVE_ACCEPTED i j
+				int i = Integer.parseInt(tokens[1]);
+				int j = Integer.parseInt(tokens[2]);
+				networkListener.onMoveAccepted(i, j);
 				break;
 
 			case "GAME_OVER":
-				// GAME_OVER WIN/LOSE/DRAW
+				// GAME_OVER WIN/LOSE/DRAW blackCount whiteCount
 				int blackCount = Integer.parseInt(tokens[2]);
 				int whiteCount = Integer.parseInt(tokens[3]);
 				networkListener.onGameOver(tokens[1], blackCount, whiteCount);
 				break;
 
 			case "ERROR":
-				System.err.println("Server error: " + message.substring(6));
+				System.err.println("サーバーエラー: " + message.substring(6));
 				break;
 
 			default:
-				System.out.println("Unknown command: " + command);
+				System.out.println("不明なコマンド: " + command);
 		}
 	}
 
@@ -99,7 +99,7 @@ public class NetworkController {
 				while (true) {
 					String line = in.readLine();
 					if (line == null) break;
-					System.out.println("Received: " + line);
+					System.out.println("受信: " + line);
 					handleMessage(line);
 				}
 			} catch (IOException e) {

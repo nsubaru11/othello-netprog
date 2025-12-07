@@ -34,13 +34,13 @@ public class GameRoom {
 		player1.sendMessage("YOUR_TURN");
 		player2.sendMessage("OPPONENT_TURN");
 
-		System.out.println("Game started in room " + roomId);
+		System.out.println("ルーム " + roomId + " でゲーム開始");
 	}
 
-	public synchronized void processMove(int row, int col) {
+	public synchronized void processMove(int i, int j) {
 		// オセロを置いて全体に知らせる
-		board.setPiece(currentTurn, row, col);
-		broadcastMessage("MOVE_ACCEPTED " + row + " " + col);
+		board.setPiece(currentTurn, i, j);
+		broadcastMessage("MOVE_ACCEPTED " + i + " " + j);
 
 		// ゲーム終了判定
 		if (isGameOver()) endGame();
@@ -57,7 +57,7 @@ public class GameRoom {
 	}
 
 	private void handlePass() {
-		System.out.println(currentTurn + " has no valid moves, passing...");
+		System.out.println(currentTurn + " は置ける場所がないためパス");
 		broadcastMessage("PASS " + currentTurn);
 
 		// ターンを切り替える
@@ -104,7 +104,7 @@ public class GameRoom {
 			result = "Draw";
 		}
 
-		System.out.println("Game over in room " + roomId + ": " + result);
+		System.out.println("ルーム " + roomId + " でゲーム終了: " + result);
 	}
 
 	public void handleDisconnect(ClientHandler player) {
@@ -117,7 +117,7 @@ public class GameRoom {
 			opponent.sendMessage("GAME_OVER WIN " + blackCount + " " + whiteCount);
 		}
 
-		System.out.println("Player disconnected from room " + roomId);
+		System.out.println("ルーム " + roomId + " でプレイヤー切断");
 	}
 
 	private void broadcastMessage(String message) {

@@ -14,7 +14,7 @@ public class OthelloServer {
 
 		try {
 			serverSocket = new ServerSocket(port);
-			System.out.println("Othello Server started on port " + port);
+			System.out.println("オセロサーバーがポート " + port + " で起動しました");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -40,7 +40,7 @@ public class OthelloServer {
 		while (true) {
 			try {
 				Socket clientSocket = serverSocket.accept();
-				System.out.println("New client connected");
+				System.out.println("新しいクライアントが接続しました");
 
 				ClientHandler handler = new ClientHandler(clientSocket, this);
 				handler.start();
@@ -62,7 +62,7 @@ public class OthelloServer {
 			ClientHandler player1 = waitingPlayers.get(boardSize).poll();
 			ClientHandler player2 = waitingPlayers.get(boardSize).poll();
 			new GameRoom(player1, player2, boardSize);
-			System.out.println("Matched: " + player1.getPlayerName() + " vs " + player2.getPlayerName());
+			System.out.println("マッチング成立: " + player1.getPlayerName() + " vs " + player2.getPlayerName());
 		}
 	}
 

@@ -33,7 +33,7 @@ class GamePanel extends JPanel {
 			GREEN_FRAME_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResource("../assets/greenFrame.jpg")));
 			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(GamePanel.class.getResourceAsStream("../assets/background.png")));
 		} catch (final IOException e) {
-			throw new RuntimeException("Failed to load cell images", e);
+			throw new RuntimeException("セル画像の読み込みに失敗しました", e);
 		}
 	}
 
@@ -88,18 +88,18 @@ class GamePanel extends JPanel {
 
 		// 各セルの初期化
 		board = new JButton[boardSize][boardSize];
-		for (int row = 0; row < boardSize; row++) {
-			for (int col = 0; col < boardSize; col++) {
-				board[row][col] = new JButton();
-				initButton(row, col, greenCellIcon);
+		for (int i = 0; i < boardSize; i++) {
+			for (int j = 0; j < boardSize; j++) {
+				board[i][j] = new JButton();
+				initButton(i, j, greenCellIcon);
 				// 端のマスには余白を挿入
-				int left = col == 0 ? 10 : 0;
-				int right = col == boardSize - 1 ? 10 : 0;
+				int left = j == 0 ? 10 : 0;
+				int right = j == boardSize - 1 ? 10 : 0;
 				gbc.insets = new Insets(0, left, 0, right);
-				gbc.gridx = col;
-				gbc.gridy = row + 1;
+				gbc.gridx = j;
+				gbc.gridy = i + 1;
 				gbc.gridwidth = 1;
-				add(board[row][col], gbc);
+				add(board[i][j], gbc);
 			}
 		}
 
@@ -152,9 +152,9 @@ class GamePanel extends JPanel {
 			prepareImages(cellSize);
 			Dimension newDim = new Dimension(cellSize, cellSize);
 
-			for (int row = 0; row < boardSize; row++) {
-				for (int col = 0; col < boardSize; col++) {
-					JButton button = board[row][col];
+			for (int i = 0; i < boardSize; i++) {
+				for (int j = 0; j < boardSize; j++) {
+					JButton button = board[i][j];
 					button.setPreferredSize(newDim);
 					Piece piece = (Piece) button.getClientProperty(Piece.class);
 					if (piece == null) {
@@ -176,18 +176,18 @@ class GamePanel extends JPanel {
 	/**
 	 * 指定位置に駒を配置します。
 	 *
-	 * @param row   行インデックス
-	 * @param col   列インデックス
 	 * @param piece 配置する駒
+	 * @param i     行インデックス
+	 * @param j     列インデックス
 	 */
-	public void setPiece(Piece piece, int row, int col) {
-		board[row][col].putClientProperty(Piece.class, piece);
+	public void setPiece(Piece piece, int i, int j) {
+		board[i][j].putClientProperty(Piece.class, piece);
 		if (piece.isBlack()) {
-			board[row][col].setIcon(blackCellIcon);
+			board[i][j].setIcon(blackCellIcon);
 		} else if (piece.isWhite()) {
-			board[row][col].setIcon(whiteCellIcon);
+			board[i][j].setIcon(whiteCellIcon);
 		} else {
-			board[row][col].setIcon(greenCellIcon);
+			board[i][j].setIcon(greenCellIcon);
 		}
 	}
 
@@ -239,12 +239,12 @@ class GamePanel extends JPanel {
 	/**
 	 * ボタンの初期化を行います。
 	 *
-	 * @param row         初期化するセルの行インデックス
-	 * @param col         初期化するセルの列インデックス
+	 * @param i           初期化するセルの行インデックス
+	 * @param j           初期化するセルの列インデックス
 	 * @param normalImage 通常時の画像
 	 */
-	private void initButton(int row, int col, ImageIcon normalImage) {
-		JButton button = board[row][col];
+	private void initButton(int i, int j, ImageIcon normalImage) {
+		JButton button = board[i][j];
 		// ボタンの基本設定（枠線を消し、透明化）
 		button.putClientProperty(Piece.class, Piece.EMPTY);
 		button.setIcon(normalImage);
@@ -255,8 +255,8 @@ class GamePanel extends JPanel {
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(final MouseEvent e) {
-				System.out.println("Cell(" + row + ", " + col + ", " + board[row][col].getClientProperty(Piece.class) + ")");
-				controller.setPiece(row, col);
+				System.out.println("Cell(" + i + ", " + j + ", " + board[i][j].getClientProperty(Piece.class) + ")");
+				controller.setPiece(i, j);
 			}
 		});
 	}

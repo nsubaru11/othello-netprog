@@ -16,7 +16,7 @@ public final class Board {
 	private final Cell[][] board;
 	private final Map<Integer, List<Integer>> blackValidCells = new HashMap<>();
 	private final Map<Integer, List<Integer>> whiteValidCells = new HashMap<>();
-	private int blackCnt = 0, whiteCnt = 0;
+	private int blackCount = 0, whiteCount = 0;
 
 	/**
 	 * n*nのオセロの作成。ただし、nは6以上の偶数
@@ -39,10 +39,13 @@ public final class Board {
 	}
 
 	/**
-	 * 引数に与えたplayerの保持コマ数
+	 * 引数に与えたplayerの保持コマ数を返す
+	 *
+	 * @param piece 駒の種類（黒または白）
+	 * @return プレイヤーの駒数
 	 */
 	public int getStoneCount(final Piece piece) {
-		return piece.isBlack() ? blackCnt : whiteCnt;
+		return piece.isBlack() ? blackCount : whiteCount;
 	}
 
 	public Map<Integer, List<Integer>> getValidCells(final Piece piece) {
@@ -114,14 +117,14 @@ public final class Board {
 	}
 
 	public void placeBlack(final int i, final int j) {
-		if (board[i][j].isWhite()) whiteCnt--;
-		blackCnt++;
+		if (board[i][j].isWhite()) whiteCount--;
+		blackCount++;
 		board[i][j].setPiece(Piece.BLACK);
 	}
 
 	public void placeWhite(final int i, final int j) {
-		if (board[i][j].isBlack()) blackCnt--;
-		whiteCnt++;
+		if (board[i][j].isBlack()) blackCount--;
+		whiteCount++;
 		board[i][j].setPiece(Piece.WHITE);
 	}
 

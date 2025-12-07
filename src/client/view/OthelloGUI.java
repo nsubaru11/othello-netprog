@@ -31,13 +31,13 @@ public class OthelloGUI extends JFrame {
 	private static final String CARD_RESULT = "result";
 
 	static {
-		// iconは読み込み失敗してもアプリ動作には影響しないため、ログ出力のみで続行
+		// アイコンは読み込み失敗してもアプリ動作には影響しないため、ログ出力のみで続行
 		Image image = null;
 		try {
 			URL imageUrl = OthelloGUI.class.getResource(ICON_IMAGE_PATH);
-			image = ImageIO.read(Objects.requireNonNull(imageUrl, "Icon image not found: " + ICON_IMAGE_PATH));
+			image = ImageIO.read(Objects.requireNonNull(imageUrl, "アイコン画像が見つかりません: " + ICON_IMAGE_PATH));
 		} catch (final IOException e) {
-			System.err.println("Failed to load icon image file due to I/O error.");
+			System.err.println("アイコン画像のI/Oエラーで読み込みに失敗しました。");
 		} catch (final NullPointerException e) {
 			System.err.println(e.getMessage());
 		}
@@ -161,8 +161,8 @@ public class OthelloGUI extends JFrame {
 		repaint();
 	}
 
-	public void setPiece(Piece piece, int row, int col) {
-		gamePanel.setPiece(piece, row, col);
+	public void setPiece(Piece piece, int i, int j) {
+		gamePanel.setPiece(piece, i, j);
 	}
 
 	/**

@@ -27,7 +27,7 @@ class ResultPanel extends JPanel {
 			BACKGROUND_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("../assets/background.png")));
 			HOME_IMAGE = ImageIO.read(Objects.requireNonNull(ResultPanel.class.getResourceAsStream("../assets/home.png")));
 		} catch (final IOException e) {
-			throw new RuntimeException("Failed to load result panel images", e);
+			throw new RuntimeException("結果画面の画像読み込みに失敗しました", e);
 		}
 	}
 
@@ -135,16 +135,16 @@ class ResultPanel extends JPanel {
 		String titleText;
 		switch (result) {
 			case "WIN":
-				titleText = "You Win!";
+				titleText = "You win!";
 				break;
 			case "LOSE":
-				titleText = "You Lose!";
+				titleText = "You Lose...";
 				break;
 			case "DRAW":
-				titleText = "Draw!";
+				titleText = "Draw！";
 				break;
 			default:
-				titleText = "Game Over";
+				titleText = "Game Over!";
 				break;
 		}
 		g2d.setFont(TITLE_FONT);
