@@ -141,7 +141,7 @@ class ResultPanel extends JPanel {
 				titleText = "You Lose...";
 				break;
 			case "DRAW":
-				titleText = "Draw！";
+				titleText = "Draw!";
 				break;
 			default:
 				titleText = "Game Over!";

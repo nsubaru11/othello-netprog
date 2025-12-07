@@ -42,13 +42,13 @@ public class GameController implements NetworkListener {
 		this.myColor = assignedColor;
 		this.currentTurn = Piece.BLACK;
 		System.out.println("ゲーム開始！あなたは " + myColor);
-		SwingUtilities.invokeLater(() -> gui.showMessage("Game started！ You are " + myColor));
+		SwingUtilities.invokeLater(() -> gui.showMessage("Game started! You are " + myColor));
 	}
 
 	public void onYourTurn() {
 		this.currentTurn = myColor;
 		System.out.println("あなたのターン！");
-		SwingUtilities.invokeLater(() -> gui.showMessage("Your turn！ Your color is " + myColor));
+		SwingUtilities.invokeLater(() -> gui.showMessage("Your turn! Your color is " + myColor));
 	}
 
 	public void onOpponentTurn() {
