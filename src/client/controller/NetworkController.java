@@ -1,5 +1,6 @@
 package client.controller;
 
+import common.*;
 import model.*;
 
 import java.io.*;
@@ -22,7 +23,7 @@ public class NetworkController {
 			socket = new Socket(DEFAULT_HOST, DEFAULT_PORT);
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			out.println("CONNECT " + playerName + " " + boardSize);
+			out.println(Protocol.connect(playerName, boardSize));
 			out.flush();
 			MessageReceiveThread receiveThread = new MessageReceiveThread();
 			receiveThread.start();
@@ -34,12 +35,12 @@ public class NetworkController {
 	}
 
 	public void sendMove(int i, int j) {
-		out.println("MOVE " + i + " " + j);
+		out.println(Protocol.move(i, j));
 		out.flush();
 	}
 
 	public void sendResign() {
-		out.println("RESIGN");
+		out.println(Protocol.resign());
 		out.flush();
 	}
 
@@ -53,43 +54,43 @@ public class NetworkController {
 
 	private void handleMessage(String message) {
 		String[] tokens = message.split(" ");
-		String command = tokens[0];
+		CommandType command = CommandType.fromToken(tokens[0]);
 
 		switch (command) {
-			case "GAME_START":
+			case GAME_START:
 				// GAME_START BLACK または GAME_START WHITE
 				Piece color = Piece.valueOf(tokens[1]);
 				networkListener.onGameStart(color);
 				break;
 
-			case "YOUR_TURN":
+			case YOUR_TURN:
 				networkListener.onYourTurn();
 				break;
 
-			case "OPPONENT_TURN":
+			case OPPONENT_TURN:
 				networkListener.onOpponentTurn();
 				break;
 
-			case "MOVE_ACCEPTED":
+			case MOVE_ACCEPTED:
 				// MOVE_ACCEPTED i j
 				int i = Integer.parseInt(tokens[1]);
 				int j = Integer.parseInt(tokens[2]);
 				networkListener.onMoveAccepted(i, j);
 				break;
 
-			case "GAME_OVER":
+			case GAME_OVER:
 				// GAME_OVER WIN/LOSE/DRAW blackCount whiteCount
 				int blackCount = Integer.parseInt(tokens[2]);
 				int whiteCount = Integer.parseInt(tokens[3]);
 				networkListener.onGameOver(tokens[1], blackCount, whiteCount);
 				break;
 
-			case "ERROR":
+			case ERROR:
 				System.err.println("サーバーエラー: " + message.substring(6));
 				break;
 
 			default:
-				System.out.println("不明なコマンド: " + command);
+				System.out.println("不明なコマンド: " + tokens[0]);
 		}
 	}
 
@@ -103,7 +104,7 @@ public class NetworkController {
 					handleMessage(line);
 				}
 			} catch (IOException e) {
-				networkListener.onNetworkError("Connection lost");
+				networkListener.onNetworkError("接続が切断されました");
 			}
 		}
 	}

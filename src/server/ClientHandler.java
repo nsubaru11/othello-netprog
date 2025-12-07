@@ -1,5 +1,7 @@
 package server;
 
+import common.*;
+
 import java.io.*;
 import java.net.*;
 
@@ -27,7 +29,7 @@ public class ClientHandler extends Thread {
 		try {
 			// 最初のメッセージでプレイヤー名を取得
 			String[] firstLine = in.readLine().split(" ");
-			if (firstLine[0].equals("CONNECT")) {
+			if (CommandType.fromToken(firstLine[0]) == CommandType.CONNECT) {
 				playerName = firstLine[1];
 				int boardSize = Integer.parseInt(firstLine[2]);
 				System.out.println("プレイヤー接続: " + playerName);
@@ -52,21 +54,21 @@ public class ClientHandler extends Thread {
 
 	private void handleMessage(String message) {
 		String[] tokens = message.split(" ");
-		String command = tokens[0];
+		CommandType command = CommandType.fromToken(tokens[0]);
 
 		switch (command) {
-			case "MOVE":
+			case MOVE:
 				int i = Integer.parseInt(tokens[1]);
 				int j = Integer.parseInt(tokens[2]);
 				gameRoom.processMove(i, j);
 				break;
 
-			case "RESIGN":
+			case RESIGN:
 				gameRoom.handleResign(this);
 				break;
 
 			default:
-				System.out.println("不明なコマンド: " + command);
+				System.out.println("不明なコマンド: " + tokens[0]);
 		}
 	}
 

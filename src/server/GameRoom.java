@@ -1,5 +1,6 @@
 package server;
 
+import common.*;
 import model.*;
 
 public class GameRoom {
@@ -28,11 +29,11 @@ public class GameRoom {
 	}
 
 	private void startGame() {
-		player1.sendMessage("GAME_START BLACK");
-		player2.sendMessage("GAME_START WHITE");
+		player1.sendMessage(Protocol.gameStart(Piece.BLACK));
+		player2.sendMessage(Protocol.gameStart(Piece.WHITE));
 
-		player1.sendMessage("YOUR_TURN");
-		player2.sendMessage("OPPONENT_TURN");
+		player1.sendMessage(Protocol.yourTurn());
+		player2.sendMessage(Protocol.opponentTurn());
 
 		System.out.println("ルーム " + roomId + " でゲーム開始");
 	}
@@ -40,7 +41,7 @@ public class GameRoom {
 	public synchronized void processMove(int i, int j) {
 		// オセロを置いて全体に知らせる
 		board.setPiece(currentTurn, i, j);
-		broadcastMessage("MOVE_ACCEPTED " + i + " " + j);
+		broadcastMessage(Protocol.moveAccepted(i, j));
 
 		// ゲーム終了判定
 		if (isGameOver()) endGame();
@@ -58,7 +59,7 @@ public class GameRoom {
 
 	private void handlePass() {
 		System.out.println(currentTurn + " は置ける場所がないためパス");
-		broadcastMessage("PASS " + currentTurn);
+		broadcastMessage(Protocol.pass(currentTurn));
 
 		// ターンを切り替える
 		currentTurn = currentTurn == Piece.BLACK ? Piece.WHITE : Piece.BLACK;
@@ -67,11 +68,11 @@ public class GameRoom {
 
 	private void notifyTurnChange() {
 		if (currentTurn == Piece.BLACK) {
-			player1.sendMessage("YOUR_TURN");
-			player2.sendMessage("OPPONENT_TURN");
+			player1.sendMessage(Protocol.yourTurn());
+			player2.sendMessage(Protocol.opponentTurn());
 		} else {
-			player1.sendMessage("OPPONENT_TURN");
-			player2.sendMessage("YOUR_TURN");
+			player1.sendMessage(Protocol.opponentTurn());
+			player2.sendMessage(Protocol.yourTurn());
 		}
 	}
 
@@ -91,17 +92,17 @@ public class GameRoom {
 
 		String result;
 		if (blackCount > whiteCount) {
-			player1.sendMessage("GAME_OVER WIN " + blackCount + " " + whiteCount);
-			player2.sendMessage("GAME_OVER LOSE " + blackCount + " " + whiteCount);
-			result = "Black wins";
+			player1.sendMessage(Protocol.gameWin(blackCount, whiteCount));
+			player2.sendMessage(Protocol.gameLose(blackCount, whiteCount));
+			result = "黒の勝利";
 		} else if (whiteCount > blackCount) {
-			player1.sendMessage("GAME_OVER LOSE " + blackCount + " " + whiteCount);
-			player2.sendMessage("GAME_OVER WIN " + blackCount + " " + whiteCount);
-			result = "White wins";
+			player1.sendMessage(Protocol.gameLose(blackCount, whiteCount));
+			player2.sendMessage(Protocol.gameWin(blackCount, whiteCount));
+			result = "白の勝利";
 		} else {
-			player1.sendMessage("GAME_OVER DRAW " + blackCount + " " + whiteCount);
-			player2.sendMessage("GAME_OVER DRAW " + blackCount + " " + whiteCount);
-			result = "Draw";
+			player1.sendMessage(Protocol.gameDraw(blackCount, whiteCount));
+			player2.sendMessage(Protocol.gameDraw(blackCount, whiteCount));
+			result = "引き分け";
 		}
 
 		System.out.println("ルーム " + roomId + " でゲーム終了: " + result);
@@ -113,10 +114,10 @@ public class GameRoom {
 		int blackCount = board.getStoneCount(Piece.BLACK);
 		int whiteCount = board.getStoneCount(Piece.WHITE);
 
-		resigner.sendMessage("GAME_OVER LOSE " + blackCount + " " + whiteCount);
+		resigner.sendMessage(Protocol.gameLose(blackCount, whiteCount));
 
-		opponent.sendMessage("OPPONENT_RESIGNED");
-		opponent.sendMessage("GAME_OVER WIN " + blackCount + " " + whiteCount);
+		opponent.sendMessage(Protocol.opponentResigned());
+		opponent.sendMessage(Protocol.gameWin(blackCount, whiteCount));
 
 		System.out.println("Room " + roomId + ": Player resigned");
 		endGame();
@@ -126,10 +127,10 @@ public class GameRoom {
 		// 相手に勝利通知
 		ClientHandler opponent = player == player1 ? player2 : player1;
 		if (opponent != null) {
-			opponent.sendMessage("OPPONENT_DISCONNECTED");
+			opponent.sendMessage(Protocol.opponentDisconnected());
 			int blackCount = board.getStoneCount(Piece.BLACK);
 			int whiteCount = board.getStoneCount(Piece.WHITE);
-			opponent.sendMessage("GAME_OVER WIN " + blackCount + " " + whiteCount);
+			opponent.sendMessage(Protocol.gameWin(blackCount, whiteCount));
 		}
 
 		System.out.println("ルーム " + roomId + " でプレイヤー切断");
