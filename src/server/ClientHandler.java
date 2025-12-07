@@ -6,13 +6,13 @@ import java.io.*;
 import java.net.*;
 
 public class ClientHandler extends Thread {
-	private Socket socket;
-	private PrintWriter out;
-	private BufferedReader in;
+	private final Socket socket;
+	private final PrintWriter out;
+	private final BufferedReader in;
+	private final OthelloServer server;
+	private GameRoom gameRoom;
 	private String playerName;
 	private Piece playerColor;
-	private GameRoom gameRoom;
-	private OthelloServer server;
 
 	public ClientHandler(Socket socket, OthelloServer server) {
 		this.socket = socket;
@@ -22,7 +22,7 @@ public class ClientHandler extends Thread {
 			out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -49,7 +49,7 @@ public class ClientHandler extends Thread {
 		} catch (IOException e) {
 			System.out.println("Connection error with " + playerName);
 		} finally {
-			cleanup();
+			handleDisconnect();
 		}
 	}
 
@@ -61,15 +61,11 @@ public class ClientHandler extends Thread {
 			case "MOVE":
 				int row = Integer.parseInt(tokens[1]);
 				int col = Integer.parseInt(tokens[2]);
-				if (gameRoom != null) {
-					gameRoom.processMove(this, row, col);
-				}
+				gameRoom.processMove(this, row, col);
 				break;
 
 			case "RESIGN":
-				if (gameRoom != null) {
-					gameRoom.handleDisconnect(this);
-				}
+				gameRoom.handleDisconnect(this);
 				break;
 
 			default:
@@ -98,17 +94,18 @@ public class ClientHandler extends Thread {
 		return playerName;
 	}
 
-	private void cleanup() {
-		if (gameRoom != null) {
-			gameRoom.handleDisconnect(this);
-		}
-
+	public void close() {
 		try {
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
 
+	private void handleDisconnect() {
+		if (gameRoom != null) gameRoom.handleDisconnect(this);
+		else server.disconnectPlayer(this);
 		System.out.println("Player disconnected: " + playerName);
+		close();
 	}
 }

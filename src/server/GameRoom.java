@@ -2,34 +2,34 @@ package server;
 
 import model.*;
 
-import java.util.*;
-
 public class GameRoom {
 	private static int roomIdCounter = 0;
 
 	private final int roomId;
-	private ClientHandler player1;  // 黒
-	private ClientHandler player2;  // 白
-	private Board board;
+	private final Board board;
+	private final ClientHandler player1;  // 黒
+	private final ClientHandler player2;  // 白
 	private Piece currentTurn;
-	private boolean gameStarted = false;
 
-	public GameRoom(int boardSize, ClientHandler player1, ClientHandler player2) {
+	public GameRoom(ClientHandler player1, ClientHandler player2, int boardSize) {
 		this.roomId = roomIdCounter++;
 		this.board = new Board(boardSize);
 		this.currentTurn = Piece.BLACK;
+
+		// player1
 		this.player1 = player1;
 		player1.setGameRoom(this);
 		player1.setPlayerColor(Piece.BLACK);
+
+		// player2
 		this.player2 = player2;
 		player2.setGameRoom(this);
 		player2.setPlayerColor(Piece.WHITE);
+
 		startGame();
 	}
 
 	private void startGame() {
-		gameStarted = true;
-
 		player1.sendMessage("GAME_START BLACK");
 		player2.sendMessage("GAME_START WHITE");
 
@@ -40,43 +40,23 @@ public class GameRoom {
 	}
 
 	public synchronized void processMove(ClientHandler player, int row, int col) {
-		// 1. 手番確認
 		Piece playerColor = player.getPlayerColor();
-		if (playerColor != currentTurn) {
-			player.sendMessage("ERROR Not your turn");
-			return;
-		}
 
-		// 2. 有効手確認
-		Map<Integer, List<Integer>> validMoves = board.getValidCells(playerColor);
-		int posIndex = row * board.getSize() + col;
-
-		if (!validMoves.containsKey(posIndex)) {
-			player.sendMessage("ERROR Invalid move");
-			return;
-		}
-
-		// 3. 駒を置く
+		// オセロを置いて全体に知らせる
 		board.setPiece(playerColor, row, col);
-
-		// 4. 両プレイヤーに通知
 		broadcastMessage("MOVE_ACCEPTED " + row + " " + col);
 
-		// 5. ターン交代
-		currentTurn = (currentTurn == Piece.BLACK) ? Piece.WHITE : Piece.BLACK;
+		// ゲーム終了判定
+		if (isGameOver()) endGame();
 
-		// 6. 次のプレイヤーが動けるか確認
-		if (!board.getValidCells(currentTurn).isEmpty()) {
-			// 動ける
-			notifyTurnChange();
+		// ターンを切り替える
+		currentTurn = currentTurn == Piece.BLACK ? Piece.WHITE : Piece.BLACK;
+
+		// 置けるかどうかチェック
+		if (board.countValidCells(currentTurn) > 0) {
+			notifyTurnChange(); // 置ける
 		} else {
-			// パス処理
-			handlePass();
-		}
-
-		// 7. ゲーム終了判定
-		if (isGameOver()) {
-			endGame();
+			handlePass(); // パス処理
 		}
 	}
 
@@ -84,15 +64,9 @@ public class GameRoom {
 		System.out.println(currentTurn + " has no valid moves, passing...");
 		broadcastMessage("PASS " + currentTurn);
 
-		// ターンを戻す
-		currentTurn = (currentTurn == Piece.BLACK) ? Piece.WHITE : Piece.BLACK;
-
-		// 相手も動けないかチェック
-		if (board.getValidCells(currentTurn).isEmpty()) {
-			endGame();
-		} else {
-			notifyTurnChange();
-		}
+		// ターンを切り替える
+		currentTurn = currentTurn == Piece.BLACK ? Piece.WHITE : Piece.BLACK;
+		notifyTurnChange();
 	}
 
 	private void notifyTurnChange() {
@@ -106,26 +80,31 @@ public class GameRoom {
 	}
 
 	private boolean isGameOver() {
-		return board.getValidCells(Piece.BLACK).isEmpty()
-				&& board.getValidCells(Piece.WHITE).isEmpty();
+		return board.countValidCells(Piece.BLACK) == 0 && board.countValidCells(Piece.WHITE) == 0;
 	}
 
 	private void endGame() {
+		notifyResult();
+		player1.close();
+		player2.close();
+	}
+
+	private void notifyResult() {
 		int blackCount = board.getStoneCount(Piece.BLACK);
 		int whiteCount = board.getStoneCount(Piece.WHITE);
 
 		String result;
 		if (blackCount > whiteCount) {
-			player1.sendMessage("GAME_OVER WIN");
-			player2.sendMessage("GAME_OVER LOSE");
+			player1.sendMessage("GAME_OVER WIN " + blackCount + " " + whiteCount);
+			player2.sendMessage("GAME_OVER LOSE " + blackCount + " " + whiteCount);
 			result = "Black wins";
 		} else if (whiteCount > blackCount) {
-			player1.sendMessage("GAME_OVER LOSE");
-			player2.sendMessage("GAME_OVER WIN");
+			player1.sendMessage("GAME_OVER LOSE " + blackCount + " " + whiteCount);
+			player2.sendMessage("GAME_OVER WIN " + blackCount + " " + whiteCount);
 			result = "White wins";
 		} else {
-			player1.sendMessage("GAME_OVER DRAW");
-			player2.sendMessage("GAME_OVER DRAW");
+			player1.sendMessage("GAME_OVER DRAW " + blackCount + " " + whiteCount);
+			player2.sendMessage("GAME_OVER DRAW " + blackCount + " " + whiteCount);
 			result = "Draw";
 		}
 
@@ -133,10 +112,8 @@ public class GameRoom {
 	}
 
 	public void handleDisconnect(ClientHandler player) {
-		if (!gameStarted) return;
-
 		// 相手に勝利通知
-		ClientHandler opponent = (player == player1) ? player2 : player1;
+		ClientHandler opponent = player == player1 ? player2 : player1;
 		if (opponent != null) {
 			opponent.sendMessage("OPPONENT_DISCONNECTED");
 			opponent.sendMessage("GAME_OVER WIN");
@@ -148,13 +125,5 @@ public class GameRoom {
 	private void broadcastMessage(String message) {
 		if (player1 != null) player1.sendMessage(message);
 		if (player2 != null) player2.sendMessage(message);
-	}
-
-	public int getRoomId() {
-		return roomId;
-	}
-
-	public boolean isFull() {
-		return player1 != null && player2 != null;
 	}
 }

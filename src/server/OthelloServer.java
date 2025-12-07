@@ -7,11 +7,9 @@ import java.util.*;
 public class OthelloServer {
 	private static final int DEFAULT_PORT = 10000;
 	private ServerSocket serverSocket;
-	private List<GameRoom> rooms;
-	private HashMap<Integer, Queue<ClientHandler>> waitingPlayers;
+	private final HashMap<Integer, Queue<ClientHandler>> waitingPlayers;
 
 	public OthelloServer(int port) {
-		rooms = new ArrayList<>();
 		waitingPlayers = new HashMap<>();
 
 		try {
@@ -63,9 +61,12 @@ public class OthelloServer {
 		while (waitingPlayers.get(boardSize).size() >= 2) {
 			ClientHandler player1 = waitingPlayers.get(boardSize).poll();
 			ClientHandler player2 = waitingPlayers.get(boardSize).poll();
-			GameRoom room = new GameRoom(boardSize, player1, player2);
-			rooms.add(room);
+			new GameRoom(player1, player2, boardSize);
 			System.out.println("Matched: " + player1.getPlayerName() + " vs " + player2.getPlayerName());
 		}
+	}
+
+	public void disconnectPlayer(ClientHandler player) {
+		waitingPlayers.values().forEach(queue -> queue.remove(player));
 	}
 }
