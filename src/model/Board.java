@@ -53,8 +53,8 @@ public final class Board {
 	}
 
 	public void updateValidMoves() {
-		blackValidCells.forEach((k, v) -> v.clear());
-		whiteValidCells.forEach((k, v) -> v.clear());
+		blackValidCells.clear();
+		whiteValidCells.clear();
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
 				Piece piece = board[i][j].getPiece();
