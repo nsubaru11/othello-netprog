@@ -19,12 +19,10 @@ public class GameRoom {
 		// player1
 		this.player1 = player1;
 		player1.setGameRoom(this);
-		player1.setPlayerColor(Piece.BLACK);
 
 		// player2
 		this.player2 = player2;
 		player2.setGameRoom(this);
-		player2.setPlayerColor(Piece.WHITE);
 
 		startGame();
 	}
@@ -39,11 +37,9 @@ public class GameRoom {
 		System.out.println("Game started in room " + roomId);
 	}
 
-	public synchronized void processMove(ClientHandler player, int row, int col) {
-		Piece playerColor = player.getPlayerColor();
-
+	public synchronized void processMove(int row, int col) {
 		// オセロを置いて全体に知らせる
-		board.setPiece(playerColor, row, col);
+		board.setPiece(currentTurn, row, col);
 		broadcastMessage("MOVE_ACCEPTED " + row + " " + col);
 
 		// ゲーム終了判定
@@ -74,8 +70,8 @@ public class GameRoom {
 			player1.sendMessage("YOUR_TURN");
 			player2.sendMessage("OPPONENT_TURN");
 		} else {
-			player2.sendMessage("YOUR_TURN");
 			player1.sendMessage("OPPONENT_TURN");
+			player2.sendMessage("YOUR_TURN");
 		}
 	}
 

@@ -12,7 +12,6 @@ public class ClientHandler extends Thread {
 	private final OthelloServer server;
 	private GameRoom gameRoom;
 	private String playerName;
-	private Piece playerColor;
 
 	public ClientHandler(Socket socket, OthelloServer server) {
 		this.socket = socket;
@@ -61,7 +60,7 @@ public class ClientHandler extends Thread {
 			case "MOVE":
 				int row = Integer.parseInt(tokens[1]);
 				int col = Integer.parseInt(tokens[2]);
-				gameRoom.processMove(this, row, col);
+				gameRoom.processMove(row, col);
 				break;
 
 			case "RESIGN":
@@ -80,14 +79,6 @@ public class ClientHandler extends Thread {
 
 	public void setGameRoom(GameRoom room) {
 		this.gameRoom = room;
-	}
-
-	public Piece getPlayerColor() {
-		return playerColor;
-	}
-
-	public void setPlayerColor(Piece color) {
-		this.playerColor = color;
 	}
 
 	public String getPlayerName() {

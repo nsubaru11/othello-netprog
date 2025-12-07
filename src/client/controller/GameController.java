@@ -59,12 +59,12 @@ public class GameController implements NetworkListener {
 
 	public void onMoveAccepted(int row, int col) {
 		System.out.println("Move accepted: (" + row + ", " + col + ")");
-		placePieces(row, col);
+		placePiece(row, col);
 		List<Integer> validCells = board.getValidCells(currentTurn).get(row * boardSize + col);
 		for (int cell : validCells) {
 			int ni = cell / boardSize;
 			int nj = cell % boardSize;
-			placePieces(ni, nj);
+			placePiece(ni, nj);
 		}
 		board.updateValidMoves();
 	}
@@ -79,7 +79,7 @@ public class GameController implements NetworkListener {
 		SwingUtilities.invokeLater(() -> gui.showMessage("Network error: " + message));
 	}
 
-	private void placePieces(int row, int col) {
+	private void placePiece(int row, int col) {
 		if (currentTurn.isBlack()) {
 			board.placeBlack(row, col);
 			SwingUtilities.invokeLater(() -> gui.setPiece(currentTurn, row, col));
