@@ -9,7 +9,7 @@ set OUT_DIR=%~dp0out\production\Othello-netprog
 
 echo Compiling...
 if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
-dir /s /b "%SRC_DIR%\model\*.java" "%SRC_DIR%\server\*.java" > "%~dp0sources.txt"
+dir /s /b "%SRC_DIR%\model\*.java" "%SRC_DIR%\common\*.java" "%SRC_DIR%\server\*.java" > "%~dp0sources.txt"
 "%JAVA_HOME%\bin\javac" -encoding UTF-8 -d "%OUT_DIR%" @"%~dp0sources.txt"
 del "%~dp0sources.txt"
 
