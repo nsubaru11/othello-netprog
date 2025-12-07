@@ -18,7 +18,7 @@ public class NetworkController {
 		this.networkListener = listener;
 	}
 
-	public boolean connect(String playerName, int boardSize) {
+	public void connect(String playerName, int boardSize) {
 		try {
 			socket = new Socket(DEFAULT_HOST, DEFAULT_PORT);
 			out = new PrintWriter(socket.getOutputStream(), true);
@@ -27,10 +27,8 @@ public class NetworkController {
 			out.flush();
 			MessageReceiveThread receiveThread = new MessageReceiveThread();
 			receiveThread.start();
-			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
-			return false;
 		}
 	}
 

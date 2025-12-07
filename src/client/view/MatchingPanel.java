@@ -207,9 +207,7 @@ class MatchingPanel extends JPanel {
 		}
 		Integer selectedSize = (Integer) boardSizeComboBox.getSelectedItem();
 		int boardSize = selectedSize != null ? selectedSize : 8;
-		startButton.setEnabled(false);
-		boolean start = gui.startGame(userName, boardSize);
-		if (!start) startButton.setEnabled(true);
+		gui.startGame(userName, boardSize);
 	}
 
 	/**
@@ -228,22 +226,4 @@ class MatchingPanel extends JPanel {
 		userNameField.requestFocusInWindow();
 	}
 
-	/**
-	 * 入力されたユーザー名を取得します。
-	 *
-	 * @return ユーザー名
-	 */
-	public String getUserName() {
-		return userNameField.getText().trim();
-	}
-
-	/**
-	 * 選択されたボードサイズを取得します。
-	 *
-	 * @return ボードサイズ
-	 */
-	public int getBoardSize() {
-		Integer selectedSize = (Integer) boardSizeComboBox.getSelectedItem();
-		return selectedSize != null ? selectedSize : 8;
-	}
 }

@@ -170,16 +170,13 @@ public class OthelloGUI extends JFrame {
 	 *
 	 * @param userName  ユーザー名
 	 * @param boardSize ボードサイズ
-	 * @return ゲーム開始に成功したかどうか
 	 */
-	public boolean startGame(String userName, int boardSize) {
+	public void startGame(String userName, int boardSize) {
 		hideMatchingPanel();
 		controller = new GameController(this, userName, boardSize);
 		gamePanel = new GamePanel(this, controller, boardSize);
 		cardPanel.add(gamePanel, CARD_GAME);
-		boolean connect = controller.connect();
-		if (!connect) return false;
+		controller.connect();
 		showGame();
-		return true;
 	}
 }
