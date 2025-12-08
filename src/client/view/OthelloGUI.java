@@ -133,9 +133,10 @@ public class OthelloGUI extends JFrame {
 		hideMatchingPanel();
 		// ここで`GameController`, `GamePanel`を作成
 		controller = new GameController(this, userName, boardSize);
+		boolean connect = controller.connect();
+		if (!connect) return;
 		gamePanel = new GamePanel(this, controller, boardSize);
 		cardPanel.add(gamePanel, CARD_GAME);
-		controller.connect();
 		showGame();
 	}
 

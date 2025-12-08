@@ -27,8 +27,8 @@ public class GameController implements NetworkListener {
 		networkController = new NetworkController(this);
 	}
 
-	public void connect() {
-		networkController.connect(playerName, boardSize);
+	public boolean connect() {
+		return networkController.connect(playerName, boardSize);
 	}
 
 	public void setPiece(int i, int j) {

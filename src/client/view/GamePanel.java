@@ -42,6 +42,16 @@ class GamePanel extends JPanel {
 	private static final BufferedImage EMPTY_CELL_IMAGE;
 	/** 背景画像 */
 	private static final BufferedImage BACKGROUND_IMAGE;
+	/** 白駒（配置可能マス用ヒント）の文字列 */
+	private static final String WHITE_MOVE_HINT = "WHITE_MOVE_HINT";
+	/** 黒駒（配置可能マス用ヒント）の文字列 */
+	private static final String BLACK_MOVE_HINT = "BLACK_MOVE_HINT";
+	/** 白駒の文字列 */
+	private static final String WHITE_STONE = "WHITE_STONE";
+	/** 黒駒の文字列 */
+	private static final String BLACK_STONE = "BLACK_STONE";
+	/** 空きマスの文字列 */
+	private static final String EMPTY_CELL = "EMPTY_CELL";
 
 	static {
 		try {
@@ -169,13 +179,16 @@ class GamePanel extends JPanel {
 	 * @param j     列インデックス
 	 */
 	public void setPiece(final Piece piece, final int i, final int j) {
-		board[i][j].putClientProperty(Piece.class, piece);
+		JButton button = board[i][j];
 		if (piece.isWhite()) {
-			board[i][j].setIcon(whiteStoneIcon);
+			button.setIcon(whiteStoneIcon);
+			button.putClientProperty(Piece.class, WHITE_STONE);
 		} else if (piece.isBlack()) {
-			board[i][j].setIcon(blackStoneIcon);
+			button.setIcon(blackStoneIcon);
+			button.putClientProperty(Piece.class, BLACK_STONE);
 		} else {
-			board[i][j].setIcon(emptyCellIcon);
+			button.setIcon(emptyCellIcon);
+			button.putClientProperty(Piece.class, EMPTY_CELL);
 		}
 	}
 
@@ -187,13 +200,16 @@ class GamePanel extends JPanel {
 	 * @param j     列インデックス
 	 */
 	public void setValidPiece(final Piece piece, final int i, final int j) {
-		board[i][j].putClientProperty(Piece.class, piece);
+		JButton button = board[i][j];
 		if (piece.isWhite()) {
-			board[i][j].setIcon(whiteMoveHintIcon);
+			button.setIcon(whiteMoveHintIcon);
+			button.putClientProperty(Piece.class, WHITE_MOVE_HINT);
 		} else if (piece.isBlack()) {
-			board[i][j].setIcon(blackMoveHintIcon);
+			button.setIcon(blackMoveHintIcon);
+			button.putClientProperty(Piece.class, BLACK_MOVE_HINT);
 		} else {
-			board[i][j].setIcon(emptyCellIcon);
+			button.setIcon(emptyCellIcon);
+			button.putClientProperty(Piece.class, EMPTY_CELL);
 		}
 	}
 
@@ -252,15 +268,26 @@ class GamePanel extends JPanel {
 				for (int j = 0; j < boardSize; j++) {
 					JButton button = board[i][j];
 					button.setPreferredSize(newDim);
-					Piece piece = (Piece) button.getClientProperty(Piece.class);
-					if (piece == null) {
-						button.setIcon(emptyCellIcon);
-					} else if (piece.isWhite()) {
-						button.setIcon(whiteStoneIcon);
-					} else if (piece.isBlack()) {
-						button.setIcon(blackStoneIcon);
-					} else {
-						button.setIcon(emptyCellIcon);
+					String property = (String) button.getClientProperty(Piece.class);
+					switch (property) {
+						case WHITE_MOVE_HINT:
+							button.setIcon(whiteMoveHintIcon);
+							break;
+						case BLACK_MOVE_HINT:
+							button.setIcon(blackMoveHintIcon);
+							break;
+						case WHITE_STONE:
+							button.setIcon(whiteStoneIcon);
+							break;
+						case BLACK_STONE:
+							button.setIcon(blackStoneIcon);
+							break;
+						case EMPTY_CELL:
+							button.setIcon(emptyCellIcon);
+							break;
+						default:
+							System.err.println("Invalid piece property: " + property);
+							break;
 					}
 				}
 			}
@@ -293,7 +320,7 @@ class GamePanel extends JPanel {
 	private void initButton(final int i, final int j, final ImageIcon normalImage) {
 		JButton button = board[i][j];
 		// ボタンの基本設定（枠線を消し、透明化）
-		button.putClientProperty(Piece.class, Piece.EMPTY);
+		button.putClientProperty(Piece.class, EMPTY_CELL);
 		button.setIcon(normalImage);
 		button.setBorderPainted(false);
 		button.setContentAreaFilled(false);
@@ -302,7 +329,7 @@ class GamePanel extends JPanel {
 		button.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(final MouseEvent e) {
-				System.out.println("Cell(" + i + ", " + j + ", " + board[i][j].getClientProperty(Piece.class) + ")");
+				System.out.println("Cell(" + i + ", " + j + ", " + button.getClientProperty(Piece.class) + ")");
 				controller.setPiece(i, j);
 			}
 		});
