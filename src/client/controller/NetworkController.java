@@ -12,7 +12,7 @@ import java.net.*;
  */
 public class NetworkController {
 	private static final int DEFAULT_PORT = 10000;
-	private static final String DEFAULT_HOST = "172.18.192.1";
+	private static final String DEFAULT_HOST = "192.168.56.1";
 	private final NetworkListener networkListener;
 	private Socket socket;
 	private PrintWriter out;
