@@ -3,6 +3,7 @@ package client.view;
 import javax.imageio.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
@@ -77,7 +78,6 @@ class ResultPanel extends BaseBackgroundPanel {
 		gbc.insets = new Insets(250, 0, 10, 0);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		gbc.anchor = GridBagConstraints.CENTER;
 		add(homeButton, gbc);
 	}
 
@@ -217,9 +217,19 @@ class ResultPanel extends BaseBackgroundPanel {
 		button.setBorderPainted(false);
 		button.setContentAreaFilled(false);
 		button.setFocusPainted(false);
-		button.setOpaque(false);
+		// button.setOpaque(false);
 
 		// 押下時のアイコン変更
-		button.setPressedIcon(pressedImage);
+		button.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(final MouseEvent e) {
+				button.setIcon(pressedImage);
+			}
+
+			@Override
+			public void mouseReleased(final MouseEvent e) {
+				button.setIcon(normalImage);
+			}
+		});
 	}
 }
