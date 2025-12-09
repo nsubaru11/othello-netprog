@@ -78,22 +78,5 @@ abstract class BaseBackgroundPanel extends JPanel {
 			imgX = (panelWidth - drawWidth) / 2;
 		}
 		g.drawImage(backgroundImage, imgX, imgY, drawWidth, drawHeight, this);
-
-		// // 影付き文字を描画
-		// Graphics2D g2d = (Graphics2D) g;
-		// g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		// g2d.setFont(TITLE_FONT);
-		// FontMetrics fm = g2d.getFontMetrics();
-		// int textWidth = fm.stringWidth(TITLE_TEXT);
-		// int textX = (panelWidth - textWidth) / 2;
-		// int textY = panelHeight / 3 - fm.getHeight() / 3 + fm.getAscent() - 50;
-		//
-		// // 影の描画
-		// g2d.setColor(new Color(0, 0, 0, 120));
-		// g2d.drawString(TITLE_TEXT, textX + 3, textY + 3);
-		//
-		// // 文字の描画
-		// g2d.setColor(Color.WHITE);
-		// g2d.drawString(TITLE_TEXT, textX, textY);
 	}
 }
