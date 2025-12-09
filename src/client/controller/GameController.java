@@ -51,7 +51,6 @@ public class GameController implements NetworkListener {
 
 	public void giveUp() {
 		networkController.sendResign();
-		gui.showHome();
 	}
 
 	// --------------- NetworkListenerの実装 ---------------

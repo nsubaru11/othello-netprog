@@ -46,7 +46,6 @@ class NetworkController {
 	public void sendResign() {
 		out.println(Protocol.resign());
 		out.flush();
-		disconnect();
 	}
 
 	public void disconnect() {
@@ -93,7 +92,6 @@ class NetworkController {
 
 			case OPPONENT_RESIGNED:
 				networkListener.onOpponentResigned();
-				disconnect();
 				break;
 
 			case ERROR:
