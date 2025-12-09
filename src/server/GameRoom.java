@@ -57,6 +57,35 @@ class GameRoom {
 		}
 	}
 
+	public void handleResign(ClientHandler resigner) {
+		ClientHandler opponent = resigner == player1 ? player2 : player1;
+
+		int whiteCount = board.getStoneCount(Piece.WHITE);
+		int blackCount = board.getStoneCount(Piece.BLACK);
+
+		resigner.sendMessage(Protocol.gameLose(whiteCount, blackCount));
+
+		opponent.sendMessage(Protocol.opponentResigned());
+		opponent.sendMessage(Protocol.gameWin(whiteCount, blackCount));
+
+		System.out.println("Room " + roomId + ": Player resigned");
+
+		closeRoom();
+	}
+
+	public void handleDisconnect(ClientHandler player) {
+		// 相手に勝利通知
+		ClientHandler opponent = player == player1 ? player2 : player1;
+		if (opponent != null) {
+			opponent.sendMessage(Protocol.opponentDisconnected());
+			int whiteCount = board.getStoneCount(Piece.WHITE);
+			int blackCount = board.getStoneCount(Piece.BLACK);
+			opponent.sendMessage(Protocol.gameWin(whiteCount, blackCount));
+		}
+
+		System.out.println("ルーム " + roomId + " でプレイヤー切断");
+	}
+
 	private void handlePass() {
 		System.out.println(currentTurn + " は置ける場所がないためパス");
 		broadcastMessage(Protocol.pass(currentTurn));
@@ -82,8 +111,7 @@ class GameRoom {
 
 	private void endGame() {
 		notifyResult();
-		player1.close();
-		player2.close();
+		closeRoom();
 	}
 
 	private void notifyResult() {
@@ -108,32 +136,9 @@ class GameRoom {
 		System.out.println("ルーム " + roomId + " でゲーム終了: " + result);
 	}
 
-	public void handleResign(ClientHandler resigner) {
-		ClientHandler opponent = resigner == player1 ? player2 : player1;
-
-		int whiteCount = board.getStoneCount(Piece.WHITE);
-		int blackCount = board.getStoneCount(Piece.BLACK);
-
-		resigner.sendMessage(Protocol.gameLose(whiteCount, blackCount));
-
-		opponent.sendMessage(Protocol.opponentResigned());
-		opponent.sendMessage(Protocol.gameWin(whiteCount, blackCount));
-
-		System.out.println("Room " + roomId + ": Player resigned");
-		endGame();
-	}
-
-	public void handleDisconnect(ClientHandler player) {
-		// 相手に勝利通知
-		ClientHandler opponent = player == player1 ? player2 : player1;
-		if (opponent != null) {
-			opponent.sendMessage(Protocol.opponentDisconnected());
-			int whiteCount = board.getStoneCount(Piece.WHITE);
-			int blackCount = board.getStoneCount(Piece.BLACK);
-			opponent.sendMessage(Protocol.gameWin(whiteCount, blackCount));
-		}
-
-		System.out.println("ルーム " + roomId + " でプレイヤー切断");
+	private void closeRoom() {
+		player1.close();
+		player2.close();
 	}
 
 	private void broadcastMessage(String message) {
