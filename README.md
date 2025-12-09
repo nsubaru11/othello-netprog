@@ -1,8 +1,6 @@
 # othello-netprog
 
 ネットワーク市システム開発演習（Java演習） - 授業課題
-Java SwingとSocket通信を使用した、ネットワーク対戦型オセロゲームです。
-クライアント・サーバーアーキテクチャを採用しており、複数クライアント間でのリアルタイム対戦が可能です。
 
 ## 特徴
 
@@ -11,11 +9,6 @@ Java SwingとSocket通信を使用した、ネットワーク対戦型オセロ�
 - **GUI**: Java Swingによるリッチなグラフィカルインターフェース
 - **アシスト機能**: 石を置ける場所のハイライト表示
 - **拡張性**: MVCアーキテクチャに基づいた設計
-
-## 動作環境
-
-- Java Development Kit (JDK) 8 以上
-- Windows / macOS / Linux
 
 ## 実行方法
 
@@ -65,23 +58,3 @@ othello-netprog/
 │   └── common/              # 通信プロトコル・定数定義
 └── README.md
 ```
-
-## 技術仕様
-
-### 通信プロトコル
-
-クライアントとサーバーはテキストベースの独自プロトコルで通信します。
-詳細は `src/common/Protocol.java` および `CommandType.java` を参照してください。
-
-- `CONNECT <name> <size>`: 接続要求
-- `GAME_START <color>`: ゲーム開始通知
-- `MOVE <i> <j>`: 着手
-- `MOVE_ACCEPTED <i> <j>`:着手受理（盤面更新）
-- `YOUR_TURN` / `OPPONENT_TURN`: ターン通知
-- `GAME_OVER <result> <w_count> <b_count>`: 終了通知
-
-### 設計
-
-- **View**: `BaseBackgroundPanel` を継承した各パネルにより、背景描画の共通化とリソース管理の効率化を行っています。
-- **Model**: `Board` クラスは `Piece` 列挙型を使用し、効率的な盤面管理と石の反転ロジックを提供します。
-- **Network**: 別スレッドでの非同期受信を行い、`SwingUtilities.invokeLater` を用いて安全にUIを更新しています。
