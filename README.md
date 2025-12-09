@@ -1,4 +1,4 @@
-# Othello NetProg
+# othello-netprog
 
 ネットワーク市システム開発演習（Java演習） - 授業課題
 Java SwingとSocket通信を使用した、ネットワーク対戦型オセロゲームです。
